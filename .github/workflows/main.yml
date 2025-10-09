@@ -1,0 +1,47 @@
+name: Trello Sync
+
+on:
+  issues:
+    types: [opened, closed]
+
+jobs:
+  trello-sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Create Trello card (on issue opened)
+        if: github.event.action == 'opened'
+        env:
+          TRELLO_KEY: ${{ secrets.TRELLO_KEY }}
+          TRELLO_TOKEN: ${{ secrets.TRELLO_TOKEN }}
+          TODO_LIST_ID: ${{ secrets.TRELLO_TODO_LIST_ID }}
+        run: |
+          NUMBER=${{ github.event.issue.number }}
+          TITLE="${{ github.event.issue.title }}"
+          CARD_NAME="[#$NUMBER] $TITLE"
+          CARD_DESC="GitHub Issue: ${{ github.event.issue.html_url }}"
+
+          curl -s -X POST "https://api.trello.com/1/cards" \
+            --data-urlencode "key=$TRELLO_KEY" \
+            --data-urlencode "token=$TRELLO_TOKEN" \
+            --data-urlencode "idList=$TODO_LIST_ID" \
+            --data-urlencode "name=$CARD_NAME" \
+            --data-urlencode "desc=$CARD_DESC"
+
+      - name: Move Trello card to Done (on issue closed)
+        if: github.event.action == 'closed'
+        env:
+          TRELLO_KEY: ${{ secrets.TRELLO_KEY }}
+          TRELLO_TOKEN: ${{ secrets.TRELLO_TOKEN }}
+          DONE_LIST_ID: ${{ secrets.TRELLO_DONE_LIST_ID }}
+        run: |
+          ISSUE_NUM=${{ github.event.issue.number }}
+          QUERY="%5B%23${ISSUE_NUM}%5D"
+          SEARCH=$(curl -s "https://api.trello.com/1/search?key=$TRELLO_KEY&token=$TRELLO_TOKEN&query=$QUERY&modelTypes=cards")
+          CARD_ID=$(echo "$SEARCH" | jq -r '.cards[0].id')
+          if [ "$CARD_ID" != "null" ]; then
+            curl -s -X PUT "https://api.trello.com/1/cards/$CARD_ID" \
+              --data-urlencode "key=$TRELLO_KEY" \
+              --data-urlencode "token=$TRELLO_TOKEN" \
+              --data-urlencode "idList=$DONE_LIST_ID"
+          fi
