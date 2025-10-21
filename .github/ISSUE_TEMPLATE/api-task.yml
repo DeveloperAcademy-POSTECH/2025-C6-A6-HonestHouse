@@ -1,6 +1,6 @@
 name: API Issue
 description: 서버 API 통신 작업을 위한 템플릿입니다.
-title: "📬 API: "
+title: "API: "
 labels: ["📬 API"]
 body:
   - type: input
