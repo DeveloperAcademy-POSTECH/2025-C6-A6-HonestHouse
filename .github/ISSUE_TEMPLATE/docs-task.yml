@@ -1,6 +1,6 @@
-name: Docs Task
+name: Docs Issue
 description: 문서 작성 및 수정을 위한 템플릿입니다.
-title: "[Docs] "
+title: "📃 Docs: "
 labels: ["📃 Docs"]
 body:
   - type: input
