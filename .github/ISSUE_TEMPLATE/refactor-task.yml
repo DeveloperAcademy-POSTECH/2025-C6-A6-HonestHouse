@@ -1,6 +1,6 @@
-name: Refactor Task
+name: Refactor Issue
 description: 리팩토링 작업을 위한 템플릿입니다.
-title: "[Refactor] "
+title: "🔨 Refactor: "
 labels: ["🔨 Refactor"]
 body:
   - type: input
