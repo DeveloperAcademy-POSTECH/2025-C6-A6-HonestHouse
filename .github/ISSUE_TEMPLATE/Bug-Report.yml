@@ -1,6 +1,6 @@
 name: BugFix Issue
 description: 버그 수정용 이슈 템플릿입니다.
-title: "🐞 BugFix: "
+title: "BugFix: "
 labels: ["🐞 BugFix"]
 body:
   - type: input
