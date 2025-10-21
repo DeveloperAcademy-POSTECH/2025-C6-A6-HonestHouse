@@ -1,6 +1,6 @@
-name: Feature Request
+name: Feature Issue
 description: 새로운 기능을 개발할 때 사용하는 템플릿입니다.
-title: "[Feat] "
+title: "✨ Feature: "
 labels: ["✨ Feature"]
 body:
   - type: input
