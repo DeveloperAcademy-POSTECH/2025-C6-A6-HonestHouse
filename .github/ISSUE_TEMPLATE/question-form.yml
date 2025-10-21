@@ -1,6 +1,6 @@
 name: Question
 description: 추가 정보나 논의가 필요한 질문을 등록할 때 사용합니다.
-title: "🙋‍♂️ Question: "
+title: "Question: "
 labels: ["🙋‍♂️ Question"]
 body:
   - type: input
