@@ -1,6 +1,6 @@
 name: Design Issue
 description: UI 디자인 작업을 위한 이슈 템플릿입니다.
-title: "🎨 Design: "
+title: "Design: "
 labels: ["🎨 Design"]
 body:
   - type: input
