@@ -1,6 +1,6 @@
 name: Deploy Issue
 description: 배포 작업을 위한 이슈 템플릿입니다.
-title: "🌏 Deploy: "
+title: "Deploy: "
 labels: ["🌏 Deploy"]
 body:
   - type: input
