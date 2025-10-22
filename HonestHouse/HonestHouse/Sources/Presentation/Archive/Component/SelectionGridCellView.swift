@@ -11,7 +11,7 @@ import Kingfisher
 struct SelectionGridCellView: View {
     let photo: Photo
     let isSelected: Bool
-    let onTap: () -> Void
+    let onTapSelectionGridCell: () -> Void
     
     var body: some View {
         ZStack(alignment: .bottomTrailing) {
@@ -23,7 +23,7 @@ struct SelectionGridCellView: View {
                     .overlay(isSelected ? Color.black.opacity(0.3) : Color.clear)
             }
             
-            Button(action: onTap) {
+            Button(action: onTapSelectionGridCell) {
                 if isSelected {
                     ZStack {
                         Circle()

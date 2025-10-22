@@ -40,7 +40,7 @@ struct PhotoSelectionView: View {
                             SelectionGridCellView(
                                 photo: photo,
                                 isSelected: selectedPhotos.contains(where: { $0.url == photo.url }),
-                                onTap: { toggleSelection(for: photo) }
+                                onTapSelectionGridCell: { toggleGridCell(for: photo) }
                             )
                         }
                     }
@@ -68,7 +68,7 @@ struct PhotoSelectionView: View {
         }
     }
     
-    private func toggleSelection(for photo: Photo) {
+    private func toggleGridCell(for photo: Photo) {
         if let index = selectedPhotos.firstIndex(where: { $0.url == photo.url }) {
             selectedPhotos.remove(at: index)
         } else {

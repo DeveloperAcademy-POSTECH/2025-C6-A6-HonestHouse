@@ -12,10 +12,8 @@ struct PhotoSelectionDetailView: View {
     let photo: Photo
     
     var body: some View {
-        KFImage(URL(string: photo.url))
-            .resizable()
-            .aspectRatio(contentMode: .fit)
-            .navigationTitle("사진 상세")
-            .navigationBarTitleDisplayMode(.inline)
+            KFImage(URL(string: photo.url))
+                .resizable()
+                .aspectRatio(contentMode: .fit)
     }
 }

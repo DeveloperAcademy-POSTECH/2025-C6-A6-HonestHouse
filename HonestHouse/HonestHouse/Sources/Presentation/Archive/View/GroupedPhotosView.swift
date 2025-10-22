@@ -39,7 +39,12 @@ struct GroupedPhotosView: View {
     }
     
     private func groupedPhotosGridCell(group: GroupedPhotos) -> some View {
-        NavigationLink(destination: GroupedPhotosDetailView(groupedPhotos: group)) {
+        NavigationLink(
+            destination: GroupedPhotosDetailView(
+                groupedPhotos: group,
+                finalSelectedPhotos: vm.selectedPhotosInGroup,
+                onTapGroupedPhoto: toggleGroupedPhoto)
+        ) {
             if let firstPhoto = group.photos.first {
                 KFImage(URL(string: firstPhoto.url))
                     .resizable()
@@ -59,6 +64,14 @@ struct GroupedPhotosView: View {
                         }
                     )
             }
+        }
+    }
+    
+    private func toggleGroupedPhoto(for photo: Photo) {
+        if let index = vm.selectedPhotosInGroup.firstIndex(where: { $0.url == photo.url}) {
+            vm.selectedPhotosInGroup.remove(at: index)
+        } else {
+            vm.selectedPhotosInGroup.append(photo)
         }
     }
 }
