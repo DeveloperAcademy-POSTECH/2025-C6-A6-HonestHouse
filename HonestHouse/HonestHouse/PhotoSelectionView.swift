@@ -10,7 +10,7 @@ import Kingfisher
 
 struct Photo: Identifiable {
     let id = UUID()
-    let url: String
+    var url: String
     
     static func mockPhotos(count: Int) -> [Photo] {
         let baseURL = "https://raw.githubusercontent.com/Rama-Moon/MockImage/main"
@@ -29,7 +29,7 @@ struct PhotoGridView: View {
         Array(repeating: GridItem(.flexible(), spacing: 2), count: columnCount)
     }
     
-    @State private var selectedPhotoURLs: [String] = []
+    @State private var selectedPhotos: [Photo] = []
     
     var body: some View {
         NavigationStack {
@@ -39,7 +39,7 @@ struct PhotoGridView: View {
                         ForEach(photos) { photo in
                             PhotoGridCell(
                                 photo: photo,
-                                isSelected: selectedPhotoURLs.contains(photo.url),
+                                isSelected: selectedPhotos.contains(where: { $0.url == photo.url }),
                                 onTap: {
                                     toggleSelection(for: photo)
                                 }
@@ -52,7 +52,7 @@ struct PhotoGridView: View {
                 VStack {
                     Spacer()
                     // TODO: 사진이 한 장 이상 선택됐을 때 push 가능하게 수정
-                    NavigationLink(destination: GroupedPhotosView(selectedPhotoURLs: $selectedPhotoURLs)) {
+                    NavigationLink(destination: GroupedPhotosView(selectedPhotos: $selectedPhotos)) {
                         Text("완료")
                             .font(.title3)
                             .frame(maxWidth: .infinity)
@@ -71,10 +71,10 @@ struct PhotoGridView: View {
     }
     
     private func toggleSelection(for photo: Photo) {
-        if let index = selectedPhotoURLs.firstIndex(of: photo.url) {
-            selectedPhotoURLs.remove(at: index)
+        if let index = selectedPhotos.firstIndex(where: { $0.url == photo.url }) {
+            selectedPhotos.remove(at: index)
         } else {
-            selectedPhotoURLs.append(photo.url)
+            selectedPhotos.append(photo)
         }
     }
 }
@@ -86,7 +86,7 @@ struct PhotoGridCell: View {
     
     var body: some View {
         ZStack(alignment: .bottomTrailing) {
-            NavigationLink(destination: PhotoDetailView(photo: photo)) {
+            NavigationLink(destination: PhotoSelectionDetailView(photo: photo)) {
                 KFImage(URL(string: photo.url))
                     .resizable()
                     .aspectRatio(1, contentMode: .fill)
