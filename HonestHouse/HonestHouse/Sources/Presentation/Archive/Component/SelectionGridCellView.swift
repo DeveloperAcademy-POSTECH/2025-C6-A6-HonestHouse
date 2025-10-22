@@ -1,5 +1,5 @@
 //
-//  GridCellView.swift
+//  SelectionGridCellView.swift
 //  HonestHouse
 //
 //  Created by Rama on 10/22/25.
@@ -8,7 +8,7 @@
 import SwiftUI
 import Kingfisher
 
-struct PhotoGridCellView: View {
+struct SelectionGridCellView: View {
     let photo: Photo
     let isSelected: Bool
     let onTap: () -> Void

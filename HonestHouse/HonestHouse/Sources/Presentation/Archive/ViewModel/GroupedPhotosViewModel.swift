@@ -7,4 +7,6 @@
 
 import SwiftUI
 
-class GroupedPhotosViewModel { }
+class GroupedPhotosViewModel {
+    var selectedPhotos = Photo.mockPhotos(count: 20)
+}

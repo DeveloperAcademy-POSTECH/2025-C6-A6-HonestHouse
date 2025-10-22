@@ -37,7 +37,7 @@ struct PhotoSelectionView: View {
                 ScrollView {
                     LazyVGrid(columns: columns, spacing: 2) {
                         ForEach(photos) { photo in
-                            PhotoGridCellView(
+                            SelectionGridCellView(
                                 photo: photo,
                                 isSelected: selectedPhotos.contains(where: { $0.url == photo.url }),
                                 onTap: { toggleSelection(for: photo) }
@@ -50,7 +50,7 @@ struct PhotoSelectionView: View {
                 VStack {
                     Spacer()
                     // TODO: 사진이 한 장 이상 선택됐을 때 push 가능하게 수정
-                    NavigationLink(destination: GroupedPhotosView(selectedPhotos: $selectedPhotos)) {
+                    NavigationLink(destination: GroupedPhotosView()) {
                         Text("완료")
                             .font(.title3)
                             .frame(maxWidth: .infinity)
