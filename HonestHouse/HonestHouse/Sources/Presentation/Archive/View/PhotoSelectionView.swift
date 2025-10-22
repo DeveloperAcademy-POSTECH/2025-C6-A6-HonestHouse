@@ -21,7 +21,7 @@ struct Photo: Identifiable {
     }
 }
 
-struct PhotoGridView: View {
+struct PhotoSelectionView: View {
     let columnCount: Int = 3
     let photos = Photo.mockPhotos(count: 20)
     

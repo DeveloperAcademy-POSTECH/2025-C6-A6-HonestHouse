@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct GroupedPhotosView: View {
-    @Binding var selectedPhotoURLs: [String]
+    @Binding var selectedPhotos: [Photo]
     
     var body: some View {
         Image(systemName: "globe")
