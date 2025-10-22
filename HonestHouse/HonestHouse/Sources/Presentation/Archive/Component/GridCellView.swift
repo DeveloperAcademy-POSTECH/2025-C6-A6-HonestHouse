@@ -1,0 +1,47 @@
+//
+//  GridCellView.swift
+//  HonestHouse
+//
+//  Created by Rama on 10/22/25.
+//
+
+import SwiftUI
+import Kingfisher
+
+struct PhotoGridCellView: View {
+    let photo: Photo
+    let isSelected: Bool
+    let onTap: () -> Void
+    
+    var body: some View {
+        ZStack(alignment: .bottomTrailing) {
+            NavigationLink(destination: PhotoSelectionDetailView(photo: photo)) {
+                KFImage(URL(string: photo.url))
+                    .resizable()
+                    .aspectRatio(1, contentMode: .fill)
+                    .clipped()
+                    .overlay(isSelected ? Color.black.opacity(0.3) : Color.clear)
+            }
+            
+            Button(action: onTap) {
+                if isSelected {
+                    ZStack {
+                        Circle()
+                            .fill(Color.white)
+                            .frame(width: 24, height: 24)
+                        
+                        Image(systemName: "checkmark.circle.fill")
+                            .foregroundColor(.blue)
+                            .font(.system(size: 24))
+                    }
+                } else {
+                    Circle()
+                        .fill(Color.white)
+                        .frame(width: 24, height: 24)
+                }
+            }
+            .frame(width: 44, height: 44)
+            .contentShape(Rectangle())
+        }
+    }
+}

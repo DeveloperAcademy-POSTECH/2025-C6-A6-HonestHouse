@@ -37,12 +37,10 @@ struct PhotoSelectionView: View {
                 ScrollView {
                     LazyVGrid(columns: columns, spacing: 2) {
                         ForEach(photos) { photo in
-                            PhotoGridCell(
+                            PhotoGridCellView(
                                 photo: photo,
                                 isSelected: selectedPhotos.contains(where: { $0.url == photo.url }),
-                                onTap: {
-                                    toggleSelection(for: photo)
-                                }
+                                onTap: { toggleSelection(for: photo) }
                             )
                         }
                     }
@@ -75,44 +73,6 @@ struct PhotoSelectionView: View {
             selectedPhotos.remove(at: index)
         } else {
             selectedPhotos.append(photo)
-        }
-    }
-}
-
-struct PhotoGridCell: View {
-    let photo: Photo
-    let isSelected: Bool
-    let onTap: () -> Void
-    
-    var body: some View {
-        ZStack(alignment: .bottomTrailing) {
-            NavigationLink(destination: PhotoSelectionDetailView(photo: photo)) {
-                KFImage(URL(string: photo.url))
-                    .resizable()
-                    .aspectRatio(1, contentMode: .fill)
-                    .clipped()
-                    .overlay(isSelected ? Color.black.opacity(0.3) : Color.clear)
-            }
-            
-            Button(action: onTap) {
-                if isSelected {
-                    ZStack {
-                        Circle()
-                            .fill(Color.white)
-                            .frame(width: 24, height: 24)
-                        
-                        Image(systemName: "checkmark.circle.fill")
-                            .foregroundColor(.blue)
-                            .font(.system(size: 24))
-                    }
-                } else {
-                    Circle()
-                        .fill(Color.white)
-                        .frame(width: 24, height: 24)
-                }
-            }
-            .frame(width: 44, height: 44)
-            .contentShape(Rectangle())
         }
     }
 }
