@@ -8,7 +8,7 @@
 import SwiftUI
 import Kingfisher
 
-struct PhotoDetailView: View {
+struct PhotoSelectionDetailView: View {
     let photo: Photo
     
     var body: some View {
