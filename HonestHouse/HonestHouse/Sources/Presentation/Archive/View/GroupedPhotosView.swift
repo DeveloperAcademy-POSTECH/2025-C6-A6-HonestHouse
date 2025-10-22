@@ -6,21 +6,30 @@
 //
 
 import SwiftUI
+import Kingfisher
+
+struct GroupedPhotos: Identifiable {
+    let id = UUID()
+    let photos: [Photo]
+}
 
 struct GroupedPhotosView: View {
-    @State private var vm = GroupedPhotosViewModel()
+    @State private var vm: GroupedPhotosViewModel
     
     var columns: [GridItem] {
         Array(repeating: GridItem(.flexible()), count: 2)
+    }
+    
+    init(selectedPhotos: [Photo]) {
+        _vm = State(wrappedValue: GroupedPhotosViewModel(selectedPhotos: selectedPhotos))
     }
     
     var body: some View {
         NavigationStack {
             ScrollView {
                 LazyVGrid(columns: columns, spacing: 10) {
-                    // TODO: Vision 사용한 그룹핑 이후 그룹에 대해 for문 순회하게 수정
-                    ForEach(vm.selectedPhotos) { photo in
-                        groupedPhotosGridCell(groupedPhotos: photo)
+                    ForEach(vm.groupedPhotos) { group in
+                        groupedPhotosGridCell(group: group)
                     }
                 }
                 .padding(.horizontal, 16)
@@ -29,19 +38,27 @@ struct GroupedPhotosView: View {
         }
     }
     
-    private func groupedPhotosGridCell(groupedPhotos: Photo) -> some View {
-        NavigationLink(destination: GroupedPhotosDetailView()) {
-            Image(systemName: "checkmark")
-                .font(.system(size: 24))
-                .foregroundColor(.white)
-                .padding(.horizontal, 68)
-                .padding(.vertical, 52)
-                .background(Color.blue)
-                .clipShape(RoundedRectangle(cornerRadius: 12))
+    private func groupedPhotosGridCell(group: GroupedPhotos) -> some View {
+        NavigationLink(destination: GroupedPhotosDetailView(groupedPhotos: group)) {
+            if let firstPhoto = group.photos.first {
+                KFImage(URL(string: firstPhoto.url))
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .frame(width: 160, height: 120)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                    .overlay(
+                        ZStack(alignment: .topTrailing) {
+                            Text("\(group.photos.count)")
+                                .font(.caption)
+                                .fontWeight(.bold)
+                                .foregroundColor(.white)
+                                .padding(6)
+                                .background(Color.black.opacity(0.7))
+                                .clipShape(Circle())
+                                .padding(8)
+                        }
+                    )
+            }
         }
     }
-}
-
-#Preview {
-    GroupedPhotosView()
 }

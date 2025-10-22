@@ -9,13 +9,17 @@ import SwiftUI
 import Kingfisher
 
 struct GroupedPhotosDetailView: View {
+    let groupedPhotos: GroupedPhotos
+    
     var body: some View {
-        VStack {
-            KFImage(URL(string: "https://raw.githubusercontent.com/Rama-Moon/MockImage/main/photo1.JPG"))
-                .frame(maxWidth: .infinity)
-                .imageScale(.large)
-                .padding(16)
+        TabView {
+            ForEach(groupedPhotos.photos) { photo in
+                KFImage(URL(string: photo.url))
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+            }
         }
-
+        .tabViewStyle(.page)
+        .indexViewStyle(.page(backgroundDisplayMode: .always))
     }
 }

@@ -50,7 +50,7 @@ struct PhotoSelectionView: View {
                 VStack {
                     Spacer()
                     // TODO: 사진이 한 장 이상 선택됐을 때 push 가능하게 수정
-                    NavigationLink(destination: GroupedPhotosView()) {
+                    NavigationLink(destination: GroupedPhotosView(selectedPhotos: photos)) {
                         Text("완료")
                             .font(.title3)
                             .frame(maxWidth: .infinity)
