@@ -16,6 +16,10 @@ struct Photo: Identifiable, SelectableItem {
         "\(url)?kind=thumbnail"
     }
     
+    var displayURL: String? {
+        "\(url)?kind=display"
+    }
+    
     init(url: String) {
         self.url = url
         let fileExtension = (url as NSString).pathExtension.lowercased()

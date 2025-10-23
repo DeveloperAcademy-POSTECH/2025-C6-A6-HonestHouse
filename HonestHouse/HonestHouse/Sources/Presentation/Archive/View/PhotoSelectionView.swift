@@ -25,7 +25,7 @@ struct PhotoSelectionView: View {
                     LazyVGrid(columns: columns, spacing: 2) {
                         ForEach(photos) { photo in
                             SelectionGridCellView(
-                                photo: photo,
+                                item: photo,
                                 isSelected: selectedPhotos.contains(where: { $0.url == photo.url }),
                                 onTapSelectionGridCell: { toggleGridCell(for: photo) }
                             )
