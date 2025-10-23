@@ -9,3 +9,4 @@ import Foundation
 
 enum ShootingSettings { }
 enum LiveView { }
+enum ImageOperations { }
