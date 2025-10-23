@@ -8,19 +8,6 @@
 import SwiftUI
 import Kingfisher
 
-struct Photo: Identifiable {
-    let id = UUID()
-    var url: String
-    
-    static func mockPhotos(count: Int) -> [Photo] {
-        let baseURL = "https://raw.githubusercontent.com/Rama-Moon/MockImage/main"
-        
-        return (1...count).map { index in
-            Photo(url: "\(baseURL)/photo\(index).JPG")
-        }
-    }
-}
-
 struct PhotoSelectionView: View {
     let columnCount: Int = 3
     let photos = Photo.mockPhotos(count: 20)
@@ -37,10 +24,10 @@ struct PhotoSelectionView: View {
                 ScrollView {
                     LazyVGrid(columns: columns, spacing: 2) {
                         ForEach(photos) { photo in
-                            PhotoGridCellView(
-                                photo: photo,
+                            SelectionGridCellView(
+                                item: photo,
                                 isSelected: selectedPhotos.contains(where: { $0.url == photo.url }),
-                                onTap: { toggleSelection(for: photo) }
+                                onTapSelectionGridCell: { toggleGridCell(for: photo) }
                             )
                         }
                     }
@@ -50,7 +37,7 @@ struct PhotoSelectionView: View {
                 VStack {
                     Spacer()
                     // TODO: 사진이 한 장 이상 선택됐을 때 push 가능하게 수정
-                    NavigationLink(destination: GroupedPhotosView(selectedPhotos: $selectedPhotos)) {
+                    NavigationLink(destination: GroupedPhotosView(selectedPhotos: photos)) {
                         Text("완료")
                             .font(.title3)
                             .frame(maxWidth: .infinity)
@@ -68,7 +55,8 @@ struct PhotoSelectionView: View {
         }
     }
     
-    private func toggleSelection(for photo: Photo) {
+    //TODO: ViewModel 생성 후 이동
+    private func toggleGridCell(for photo: Photo) {
         if let index = selectedPhotos.firstIndex(where: { $0.url == photo.url }) {
             selectedPhotos.remove(at: index)
         } else {
