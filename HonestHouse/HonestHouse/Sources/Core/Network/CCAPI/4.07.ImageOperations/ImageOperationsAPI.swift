@@ -8,16 +8,16 @@
 import Foundation
 
 enum ImageOperationsAPI {
-    case storage
-    case directory(String)
-    case contentList(String, String)
+    case storageList                      /// 저장소 리스트
+    case directoryList(String)            /// 디렉토리 리스트
+    case contentList(String, String)      /// 컨텐츠(이미지) 리스트
     
     var apiDesc: String {
         switch self {
-        case .storage:
+        case .storageList:
             "ver100/contents"
             
-        case .directory(let storage):
+        case .directoryList(let storage):
             "ver100/contents/\(storage)"
             
         case .contentList(let storage, let directory):
