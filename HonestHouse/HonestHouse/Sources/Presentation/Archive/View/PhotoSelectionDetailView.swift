@@ -8,14 +8,12 @@
 import SwiftUI
 import Kingfisher
 
-struct PhotoSelectionDetailView: View {
-    let photo: Photo
+struct PhotoSelectionDetailView<Item: SelectableItem>: View {
+    let item: Item
     
     var body: some View {
-        KFImage(URL(string: photo.url))
-            .resizable()
-            .aspectRatio(contentMode: .fit)
-            .navigationTitle("사진 상세")
-            .navigationBarTitleDisplayMode(.inline)
+            KFImage(URL(string: item.url))
+                .resizable()
+                .aspectRatio(contentMode: .fit)
     }
 }
