@@ -18,6 +18,9 @@ extension ShootingSettings.TVResponse {
     typealias EntityType = TV
     
     func toEntity() -> TV {
-        TV()
+        TV(
+            value: value,
+            ability: ability
+        )
     }
 }

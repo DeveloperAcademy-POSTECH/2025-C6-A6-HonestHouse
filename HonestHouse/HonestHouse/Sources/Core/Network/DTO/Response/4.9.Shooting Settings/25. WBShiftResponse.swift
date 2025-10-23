@@ -10,7 +10,7 @@ extension ShootingSettings {
     /// 4.9.25 화이트 밸런스 보정
     struct WBShiftResponse: BaseResponse {
         let value: Value?
-        let ability: AbilityList?
+        let ability: Ability?
     }
 }
 
@@ -27,9 +27,9 @@ extension ShootingSettings.WBShiftResponse {
 }
 
 extension ShootingSettings.WBShiftResponse {
-    struct AbilityList: Codable {
-        let blueAmberAbility: Ability?
-        let magentaGreenAbility: Ability?
+    struct Ability: Codable {
+        let blueAmberAbility: Range?
+        let magentaGreenAbility: Range?
 
         enum CodingKeys: String, CodingKey {
             case blueAmberAbility = "ba"
@@ -38,8 +38,8 @@ extension ShootingSettings.WBShiftResponse {
     }
 }
 
-extension ShootingSettings.WBShiftResponse.AbilityList {
-    struct Ability: Codable {
+extension ShootingSettings.WBShiftResponse.Ability {
+    struct Range: Codable {
         let min: Int?
         let max: Int?
         let step: Int?
@@ -47,9 +47,36 @@ extension ShootingSettings.WBShiftResponse.AbilityList {
 }
 
 extension ShootingSettings.WBShiftResponse {
-    typealias EntityType = WhiteBalance
+    typealias EntityType = WBShift
     
-    func toEntity() -> WhiteBalance {
-        WhiteBalance()
+    func toEntity() -> WBShift {
+        // map을 체이닝해서 깔끔하게 처리
+        let entityValue = value.map { responseValue in
+            WBShift.Value(
+                blueAmber: responseValue.blueAmber,
+                magentaGreen: responseValue.magentaGreen
+            )
+        }
+        
+        let entityAbility = ability.map { list in
+            WBShift.Ability(
+                blueAmberAbility: list.blueAmberAbility.map { range in
+                    WBShift.Ability.Range(
+                        min: range.min,
+                        max: range.max,
+                        step: range.step
+                    )
+                },
+                magentaGreenAbility: list.magentaGreenAbility.map { range in
+                    WBShift.Ability.Range(
+                        min: range.min,
+                        max: range.max,
+                        step: range.step
+                    )
+                }
+            )
+        }
+        
+        return WBShift(value: entityValue, ability: entityAbility)
     }
 }

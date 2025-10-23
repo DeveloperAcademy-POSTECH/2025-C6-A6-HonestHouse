@@ -17,7 +17,7 @@ extension ShootingSettings.ShootingModeResponse {
     typealias EntityType = ShootingMode
     
     func toEntity() -> ShootingMode {
-        ShootingMode()
+        ShootingMode(value: value)
     }
 }
 

@@ -18,6 +18,9 @@ extension ShootingSettings.ISOResponse {
     typealias EntityType = ISO
     
     func toEntity() -> ISO {
-        ISO()
+        ISO(
+            value: value,
+            ability: ability
+        )
     }
 }

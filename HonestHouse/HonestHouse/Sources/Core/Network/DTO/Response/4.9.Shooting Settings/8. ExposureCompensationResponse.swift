@@ -18,6 +18,9 @@ extension ShootingSettings.ExposureCompensationResponse {
     typealias EntityType = ExposureCompensation
     
     func toEntity() -> ExposureCompensation {
-        ExposureCompensation()
+        ExposureCompensation(
+            value: value,
+            ability: ability
+        )
     }
 }

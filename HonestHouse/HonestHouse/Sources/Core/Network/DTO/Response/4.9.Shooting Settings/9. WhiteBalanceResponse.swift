@@ -18,6 +18,9 @@ extension ShootingSettings.WhiteBalanceResponse {
     typealias EntityType = WhiteBalance
     
     func toEntity() -> WhiteBalance {
-        WhiteBalance()
+        WhiteBalance(
+            value: value,
+            ability: ability
+        )
     }
 }

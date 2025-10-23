@@ -18,6 +18,9 @@ extension ShootingSettings.AVResponse {
     typealias EntityType = AV
     
     func toEntity() -> AV {
-        AV()
+        AV(
+            value: value,
+            ability: ability
+        )
     }
 }

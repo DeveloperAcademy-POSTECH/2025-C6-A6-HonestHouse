@@ -26,6 +26,13 @@ extension ShootingSettings.ColorTemperatureResponse {
     typealias EntityType = ColorTemperature
     
     func toEntity() -> ColorTemperature {
-        ColorTemperature()
+        ColorTemperature(
+            value: value,
+            ability: ColorTemperature.Ability(
+                min: ability?.min,
+                max: ability?.max,
+                step: ability?.step
+            )
+        )
     }
 }
