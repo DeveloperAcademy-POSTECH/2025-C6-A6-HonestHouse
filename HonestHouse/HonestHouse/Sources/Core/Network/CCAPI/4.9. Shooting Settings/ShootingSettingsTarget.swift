@@ -23,8 +23,6 @@ enum ShootingSettingsTarget {
     case putWhiteBalance(StringValueRequest)            /// 화이트밸런스
     case getColorTemperture                             /// 색온도
     case putColorTemperture(IntValueRequest)            /// 색온도
-    case getStillImageShootingImageQuality              /// 사진 형식
-//    case putStillImageAspectRatio                       /// 사진 비율
     case getWbShift                                     /// 화이트밸런스 보정 (Blue/Amber, Green/Magenta)
     case putWbShift(ShootingSettings.WBShiftRequest)    /// 화이트밸런스 보정 (Blue/Amber, Green/Magenta)
 }
@@ -58,11 +56,6 @@ extension ShootingSettingsTarget: BaseTargetType {
 
         case .getColorTemperture, .putColorTemperture:
             ShootingSettingsAPI.colorTemperture.path(with: .ver100)
-
-        case .getStillImageShootingImageQuality:
-            ""
-//        case .putStillImageAspectRatio:
-//            ShootingSettingsAPI.stillImageAspectRatio.path(with: .ver100)
 
         case .getWbShift, .putWbShift:
             ShootingSettingsAPI.wbShift.path(with: .ver100)
