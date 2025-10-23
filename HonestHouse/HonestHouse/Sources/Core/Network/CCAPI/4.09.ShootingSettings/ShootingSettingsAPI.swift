@@ -21,40 +21,44 @@ enum ShootingSettingsAPI {
     case stillImageAspectRatio                  /// 사진 비율
     case wbShift                                /// 화이트밸런스 보정 (Blue/Amber, Green/Magenta)
     
-    var apiDesc: String {
+    var endpoint: String {
         switch self {
         case .getShootingSetting:
-            return "ver100/shooting/settings"
+            return "shooting/settings"
             
         case .shootingMode:
-            return "ver100/shooting/settings/shootingmodedial"
+            return "shooting/settings/shootingmodedial"
             
         case .av:
-            return "ver100/shooting/settings/av"
+            return "shooting/settings/av"
             
         case .tv:
-            return "ver100/shooting/settings/tv"
+            return "shooting/settings/tv"
             
         case .iso:
-            return "ver100/shooting/settings/iso"
+            return "shooting/settings/iso"
             
         case .exposureCompensation:
-            return "ver100/shooting/settings/exposure"
+            return "shooting/settings/exposure"
             
         case .whiteBalance:
-            return "ver100/shooting/settings/wb"
+            return "shooting/settings/wb"
             
         case .colorTemperture:
-            return "ver100/shooting/settings/colortemperature"
+            return "shooting/settings/colortemperature"
             
         case .stillImageShootingImageQuality:
             return ""
             
         case .stillImageAspectRatio:
-            return "ver100/shooting/settings/stillimageaspectratio"
+            return "shooting/settings/stillimageaspectratio"
             
         case .wbShift:
-            return "ver100/shooting/settings/wbshift"
+            return "shooting/settings/wbshift"
         }
+    }
+    
+    func path(with version: VersionType) -> String {
+            return "\(version.description)/\(endpoint)"
     }
 }
