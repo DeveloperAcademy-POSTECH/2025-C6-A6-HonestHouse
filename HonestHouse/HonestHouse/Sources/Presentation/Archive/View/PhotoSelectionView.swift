@@ -8,19 +8,6 @@
 import SwiftUI
 import Kingfisher
 
-struct Photo: Identifiable {
-    let id = UUID()
-    var url: String
-    
-    static func mockPhotos(count: Int) -> [Photo] {
-        let baseURL = "https://raw.githubusercontent.com/Rama-Moon/MockImage/main"
-        
-        return (1...count).map { index in
-            Photo(url: "\(baseURL)/photo\(index).JPG")
-        }
-    }
-}
-
 struct PhotoSelectionView: View {
     let columnCount: Int = 3
     let photos = Photo.mockPhotos(count: 20)

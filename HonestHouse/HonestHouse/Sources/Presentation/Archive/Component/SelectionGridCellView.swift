@@ -8,15 +8,15 @@
 import SwiftUI
 import Kingfisher
 
-struct SelectionGridCellView: View {
-    let photo: Photo
+struct SelectionGridCellView<Item: SelectableItem>: View {
+    let item: Item
     let isSelected: Bool
     let onTapSelectionGridCell: () -> Void
     
     var body: some View {
         ZStack(alignment: .bottomTrailing) {
-            NavigationLink(destination: PhotoSelectionDetailView(photo: photo)) {
-                KFImage(URL(string: photo.url))
+            NavigationLink(destination: PhotoSelectionDetailView(item: item)) {
+                KFImage(URL(string: item.url))
                     .resizable()
                     .aspectRatio(1, contentMode: .fill)
                     .clipped()

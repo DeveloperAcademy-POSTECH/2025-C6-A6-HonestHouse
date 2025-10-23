@@ -8,11 +8,11 @@
 import SwiftUI
 import Kingfisher
 
-struct PhotoSelectionDetailView: View {
-    let photo: Photo
+struct PhotoSelectionDetailView<Item: SelectableItem>: View {
+    let item: Item
     
     var body: some View {
-            KFImage(URL(string: photo.url))
+            KFImage(URL(string: item.url))
                 .resizable()
                 .aspectRatio(contentMode: .fit)
     }
