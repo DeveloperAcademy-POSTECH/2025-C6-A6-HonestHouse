@@ -29,7 +29,7 @@ struct GroupedPhotosView: View {
             ScrollView {
                 LazyVGrid(columns: columns, spacing: 10) {
                     ForEach(vm.groupedPhotos) { group in
-                        groupedPhotosGridCell(group: group)
+                        groupedPhotosGridCellView(group: group)
                     }
                 }
                 .padding(.horizontal, 16)
@@ -38,12 +38,12 @@ struct GroupedPhotosView: View {
         }
     }
     
-    private func groupedPhotosGridCell(group: GroupedPhotos) -> some View {
+    private func groupedPhotosGridCellView(group: GroupedPhotos) -> some View {
         NavigationLink(
             destination: GroupedPhotosDetailView(
                 groupedPhotos: group,
                 finalSelectedPhotos: vm.selectedPhotosInGroup,
-                onTapGroupedPhoto: toggleGroupedPhoto)
+                onTapGroupedPhoto: toggleGroupedPhotoView)
         ) {
             if let firstPhoto = group.photos.first {
                 KFImage(URL(string: firstPhoto.url))
@@ -67,7 +67,7 @@ struct GroupedPhotosView: View {
         }
     }
     
-    private func toggleGroupedPhoto(for photo: Photo) {
+    private func toggleGroupedPhotoView(for photo: Photo) {
         if let index = vm.selectedPhotosInGroup.firstIndex(where: { $0.url == photo.url}) {
             vm.selectedPhotosInGroup.remove(at: index)
         } else {

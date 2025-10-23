@@ -55,6 +55,7 @@ struct PhotoSelectionView: View {
         }
     }
     
+    //TODO: ViewModel 생성 후 이동
     private func toggleGridCell(for photo: Photo) {
         if let index = selectedPhotos.firstIndex(where: { $0.url == photo.url }) {
             selectedPhotos.remove(at: index)
