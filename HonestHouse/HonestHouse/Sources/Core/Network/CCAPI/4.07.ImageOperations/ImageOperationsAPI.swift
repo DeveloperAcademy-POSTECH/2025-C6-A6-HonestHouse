@@ -10,7 +10,7 @@ import Foundation
 enum ImageOperationsAPI {
     case storage
     case directory(String)
-    case contentsList(String, String)
+    case contentList(String, String)
     
     var apiDesc: String {
         switch self {
@@ -20,7 +20,7 @@ enum ImageOperationsAPI {
         case .directory(let storage):
             "ver100/contents/\(storage)"
             
-        case .contentsList(let storage, let directory):
+        case .contentList(let storage, let directory):
             "ver100/contents/\(storage)/\(directory)"
         }
     }
