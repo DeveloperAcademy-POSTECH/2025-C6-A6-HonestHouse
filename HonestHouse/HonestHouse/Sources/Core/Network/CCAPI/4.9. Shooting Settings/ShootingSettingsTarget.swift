@@ -31,34 +31,34 @@ extension ShootingSettingsTarget: BaseTargetType {
     var path: String {
         switch self {
         case .getShootingSetting(let version):
-            ShootingSettingsAPI.getShootingSetting.path(with: version)
+            return ShootingSettingsAPI.getShootingSetting.path(with: version)
             
         case .getShootingMode:
-            ShootingSettingsAPI.shootingMode.path(with: .ver100)
+            return ShootingSettingsAPI.shootingMode.path(with: .ver100)
             
         case .putShootingMode:
-            ShootingSettingsAPI.shootingMode.path(with: .ver100)
+            return ShootingSettingsAPI.shootingMode.path(with: .ver100)
             
         case .getAv, .putAv:
-            ShootingSettingsAPI.av.path(with: .ver100)
+            return ShootingSettingsAPI.av.path(with: .ver100)
     
         case .getTv, .putTv:
-            ShootingSettingsAPI.tv.path(with: .ver100)
+            return ShootingSettingsAPI.tv.path(with: .ver100)
             
         case .getIso, .putIso:
-            ShootingSettingsAPI.iso.path(with: .ver100)
+            return ShootingSettingsAPI.iso.path(with: .ver100)
 
         case .getExposureCompensation, .putExposureCompensation:
-            ShootingSettingsAPI.exposureCompensation.path(with: .ver100)
+            return ShootingSettingsAPI.exposureCompensation.path(with: .ver100)
 
         case .getWhiteBalance, .putWhiteBalance:
-            ShootingSettingsAPI.whiteBalance.path(with: .ver100)
+            return ShootingSettingsAPI.whiteBalance.path(with: .ver100)
 
         case .getColorTemperature, .putColorTemperature:
-            ShootingSettingsAPI.colorTemperature.path(with: .ver100)
+            return ShootingSettingsAPI.colorTemperature.path(with: .ver100)
 
         case .getWbShift, .putWbShift:
-            ShootingSettingsAPI.wbShift.path(with: .ver100)
+            return ShootingSettingsAPI.wbShift.path(with: .ver100)
         }
     }
     
