@@ -21,8 +21,8 @@ enum ShootingSettingsTarget {
     case putExposureCompensation(StringValueRequest)    /// 노출보정
     case getWhiteBalance                                /// 화이트밸런스
     case putWhiteBalance(StringValueRequest)            /// 화이트밸런스
-    case getColorTemperture                             /// 색온도
-    case putColorTemperture(IntValueRequest)            /// 색온도
+    case getColorTemperature                             /// 색온도
+    case putColorTemperature(IntValueRequest)            /// 색온도
     case getWbShift                                     /// 화이트밸런스 보정 (Blue/Amber, Green/Magenta)
     case putWbShift(ShootingSettings.WBShiftRequest)    /// 화이트밸런스 보정 (Blue/Amber, Green/Magenta)
 }
@@ -54,8 +54,8 @@ extension ShootingSettingsTarget: BaseTargetType {
         case .getWhiteBalance, .putWhiteBalance:
             ShootingSettingsAPI.whiteBalance.path(with: .ver100)
 
-        case .getColorTemperture, .putColorTemperture:
-            ShootingSettingsAPI.colorTemperture.path(with: .ver100)
+        case .getColorTemperature, .putColorTemperature:
+            ShootingSettingsAPI.colorTemperature.path(with: .ver100)
 
         case .getWbShift, .putWbShift:
             ShootingSettingsAPI.wbShift.path(with: .ver100)
@@ -71,8 +71,7 @@ extension ShootingSettingsTarget: BaseTargetType {
                 .getIso,
                 .getExposureCompensation,
                 .getWhiteBalance,
-                .getColorTemperture,
-                .getStillImageShootingImageQuality,
+                .getColorTemperature,
                 .getWbShift:
                 return .get
 
@@ -82,8 +81,7 @@ extension ShootingSettingsTarget: BaseTargetType {
                 .putIso,
                 .putExposureCompensation,
                 .putWhiteBalance,
-                .putColorTemperture,
-//                .putStillImageAspectRatio,
+                .putColorTemperature,
                 .putWbShift
             :
             return .put
@@ -100,8 +98,7 @@ extension ShootingSettingsTarget: BaseTargetType {
                 .getIso,
                 .getExposureCompensation,
                 .getWhiteBalance,
-                .getColorTemperture,
-                .getStillImageShootingImageQuality,
+                .getColorTemperature,
                 .getWbShift:
             return .requestPlain
     
@@ -123,12 +120,9 @@ extension ShootingSettingsTarget: BaseTargetType {
         case .putWhiteBalance(let request):
             return .requestJSONEncodable(request)
 
-        case .putColorTemperture(let request):
+        case .putColorTemperature(let request):
             return .requestJSONEncodable(request)
             
-//        case .putStillImageAspectRatio:
-//            return .requestPlain
-
         case .putWbShift(let request):
             return .requestJSONEncodable(request)
         }

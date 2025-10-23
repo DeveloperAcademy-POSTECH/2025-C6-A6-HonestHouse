@@ -16,7 +16,7 @@ enum ShootingSettingsAPI {
     case iso                                    /// ISO
     case exposureCompensation                   /// 노출보정
     case whiteBalance                           /// 화이트밸런스
-    case colorTemperture                        /// 색온도
+    case colorTemperature                        /// 색온도
     case wbShift                                /// 화이트밸런스 보정 (Blue/Amber, Green/Magenta)
     
     var endpoint: String {
@@ -42,7 +42,7 @@ enum ShootingSettingsAPI {
         case .whiteBalance:
             return "shooting/settings/wb"
             
-        case .colorTemperture:
+        case .colorTemperature:
             return "shooting/settings/colortemperature"
             
         case .wbShift:
