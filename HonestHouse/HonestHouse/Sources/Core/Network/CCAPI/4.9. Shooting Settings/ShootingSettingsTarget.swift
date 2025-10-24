@@ -25,6 +25,8 @@ enum ShootingSettingsTarget {
     case putColorTemperature(IntValueRequest)            /// 색온도
     case getWbShift                                     /// 화이트밸런스 보정 (Blue/Amber, Green/Magenta)
     case putWbShift(ShootingSettings.WBShiftRequest)    /// 화이트밸런스 보정 (Blue/Amber, Green/Magenta)
+    case getPictureStyle                                /// 픽쳐스타일
+    case putPictureStyle(StringValueRequest)            /// 픽쳐스타일
 }
 
 extension ShootingSettingsTarget: BaseTargetType {
@@ -59,6 +61,9 @@ extension ShootingSettingsTarget: BaseTargetType {
 
         case .getWbShift, .putWbShift:
             return ShootingSettingsAPI.wbShift.path(with: .ver100)
+            
+        case .getPictureStyle, .putPictureStyle:
+            return ShootingSettingsAPI.pictureStyle.path(with: .ver100)
         }
     }
     
@@ -72,7 +77,8 @@ extension ShootingSettingsTarget: BaseTargetType {
                 .getExposureCompensation,
                 .getWhiteBalance,
                 .getColorTemperature,
-                .getWbShift:
+                .getWbShift,
+                .getPictureStyle:
                 return .get
 
         case .putShootingMode,
@@ -82,8 +88,8 @@ extension ShootingSettingsTarget: BaseTargetType {
                 .putExposureCompensation,
                 .putWhiteBalance,
                 .putColorTemperature,
-                .putWbShift
-            :
+                .putWbShift,
+                .putPictureStyle:
             return .put
 
         }
@@ -99,7 +105,8 @@ extension ShootingSettingsTarget: BaseTargetType {
                 .getExposureCompensation,
                 .getWhiteBalance,
                 .getColorTemperature,
-                .getWbShift:
+                .getWbShift,
+                .getPictureStyle:
             return .requestPlain
     
         case .putShootingMode(let request):
@@ -124,6 +131,9 @@ extension ShootingSettingsTarget: BaseTargetType {
             return .requestJSONEncodable(request)
             
         case .putWbShift(let request):
+            return .requestJSONEncodable(request)
+            
+        case .putPictureStyle(let request):
             return .requestJSONEncodable(request)
         }
     }
