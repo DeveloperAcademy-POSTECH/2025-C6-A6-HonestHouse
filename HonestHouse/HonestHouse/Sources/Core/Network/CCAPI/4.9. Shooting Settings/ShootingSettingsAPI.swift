@@ -18,6 +18,7 @@ enum ShootingSettingsAPI {
     case whiteBalance                           /// 화이트밸런스
     case colorTemperature                        /// 색온도
     case wbShift                                /// 화이트밸런스 보정 (Blue/Amber, Green/Magenta)
+    case pictureStyle                           /// 픽쳐스타일
     
     var endpoint: String {
         switch self {
@@ -47,6 +48,9 @@ enum ShootingSettingsAPI {
             
         case .wbShift:
             return "shooting/settings/wbshift"
+            
+        case .pictureStyle:
+            return "shooting/settings/picturestyle"
         }
     }
     
