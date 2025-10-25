@@ -8,11 +8,6 @@
 import SwiftUI
 import Kingfisher
 
-struct GroupedPhotos: Identifiable {
-    let id = UUID()
-    let photos: [Photo]
-}
-
 struct GroupedPhotosView: View {
     @State private var vm: GroupedPhotosViewModel
     
@@ -38,7 +33,7 @@ struct GroupedPhotosView: View {
         }
     }
     
-    private func groupedPhotosGridCellView(group: GroupedPhotos) -> some View {
+    private func groupedPhotosGridCellView(group: SimilarPhotoGroup) -> some View {
         NavigationLink(
             destination: GroupedPhotosDetailView(
                 groupedPhotos: group,

@@ -9,20 +9,17 @@ import SwiftUI
 
 @Observable
 class GroupedPhotosViewModel {
+    private let visionManager = VisionManager()
+    
     var photosFromSelection = Photo.mockPhotos(count: 20)
-    var groupedPhotos: [GroupedPhotos] = []
+    var groupedPhotos: [SimilarPhotoGroup] = []
     var selectedPhotosInGroup: [Photo] = []
     
     init(selectedPhotos: [Photo]) {
         self.photosFromSelection = selectedPhotos
-        groupPhotosTemporarily()
-    }
-    
-    func groupPhotosTemporarily() {
-        let chunkSize = 5
-        let chunks = stride(from: 0, to: photosFromSelection.count, by: chunkSize).map {
-            Array(photosFromSelection[$0..<min($0 + chunkSize, photosFromSelection.count)])
+        
+        Task {
+            self.groupedPhotos = try await visionManager.analyzeImages(photosFromSelection)
         }
-        self.groupedPhotos = chunks.map { GroupedPhotos(photos: $0)}
     }
 }
