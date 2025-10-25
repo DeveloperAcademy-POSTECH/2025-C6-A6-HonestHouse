@@ -25,7 +25,7 @@ struct SelectionGridCellView<Item: SelectableItem>: View {
             
             Button(action: onTapSelectionGridCell) {
                 if isSelected {
-                    ZStack {
+                    ZStack(alignment: .bottomTrailing) {
                         Circle()
                             .fill(Color.white)
                             .frame(width: 24, height: 24)
@@ -40,7 +40,7 @@ struct SelectionGridCellView<Item: SelectableItem>: View {
                         .frame(width: 24, height: 24)
                 }
             }
-            .frame(width: 44, height: 44)
+            .frame(width: 66, height: 66)
             .contentShape(Rectangle())
         }
     }

@@ -10,6 +10,7 @@ import Vision
 
 class VisionManager {
     private let imageLoader = ImageLoader()
+    
     public func analyzeImages(
         _ photos: [Photo],
         threshold: Float = 0.8
@@ -68,10 +69,11 @@ class VisionManager {
         var similarGroups: [SimilarPhotoGroup] = []
         var processedImageSet = Set<Int>()
         
+        // 유사한 사진들끼리 그룹 생성
         for idx in 0..<analyzedPhotos.count {
             if processedImageSet.contains(idx) { continue }
             
-            let group = try findSimilarImagesForGroup(
+            let group = try matchSimilarImages(
                 startIndex: idx,
                 photos: analyzedPhotos,
                 threshold: threshold,
@@ -83,69 +85,79 @@ class VisionManager {
             }
         }
         
+        // 처리되지 않은 단독 사진들을 Extra 그룹으로 추가
+        if let extraGroup = handleExtraPhotos(
+            analyzedPhotos: analyzedPhotos,
+            processedImageSet: processedImageSet
+        ) {
+            similarGroups.append(extraGroup)
+        }
+        
         return similarGroups
     }
     
     // 그룹핑을 위한 이미지를 찾음
-    private func findSimilarImagesForGroup(
+    private func matchSimilarImages(
         startIndex: Int,
         photos: [AnalyzedPhoto],
         threshold: Float,
         processed: inout Set<Int>
     ) throws -> SimilarPhotoGroup? {
         var groupImages = [photos[startIndex].photo]
-        var groupIndices = [startIndex]
+        var currentGroupIndexes = [startIndex]
         var distances: [Float] = []
-        processed.insert(startIndex)
         
         for idx in (startIndex + 1)..<photos.count {
             if processed.contains(idx) { continue }
             
             let avgDistance = try calculateAverageDistanceToGroup(
                 targetIndex: idx,
-                groupIndices: groupIndices,
+                currentGroupIndexes: currentGroupIndexes,
                 photos: photos
             )
             
-            // 현재 검사하는 이미지와 그룹 내 모든 이미지들 간의 유사도를 확인, 그 유사도의 평균값이 임계값보다 작으면 통과
+            // 그룹 내 사진과 타겟 사진 유사도의 평균값이 임계값보다 작으면 통과
             if avgDistance < threshold {
                 groupImages.append(photos[idx].photo)
-                groupIndices.append(idx)
+                currentGroupIndexes.append(idx)
                 distances.append(avgDistance)
-                processed.insert(idx)
             }
         }
         
         guard groupImages.count > 1 else { return nil }
         
-        return makeSimillarGroup(
+        for index in currentGroupIndexes {
+            processed.insert(index)
+        }
+        
+        return makeSimilarGroup(
             photos: groupImages,
             distances: distances,
             threshold: threshold
         )
     }
     
-    
+    // 그룹 내 사진과 타겟 사진의 유사도 평균을 계산
     private func calculateAverageDistanceToGroup(
         targetIndex: Int,
-        groupIndices: [Int],
+        currentGroupIndexes: [Int],
         photos: [AnalyzedPhoto]
     ) throws -> Float {
         var sumDistance: Float = 0.0
         
-        for groupIdx in groupIndices {
+        for idx in currentGroupIndexes {
             var distance: Float = 0.0
-            try photos[groupIdx].observation.computeDistance(
+            try photos[idx].observation.computeDistance(
                 &distance,
                 to: photos[targetIndex].observation
             )
             sumDistance += distance
         }
         
-        return sumDistance / Float(groupIndices.count)
+        return sumDistance / Float(currentGroupIndexes.count)
     }
 
-    private func makeSimillarGroup(
+    private func makeSimilarGroup(
         photos: [Photo],
         distances: [Float],
         threshold: Float
@@ -157,6 +169,30 @@ class VisionManager {
             photos: photos,
             averageDistance: avgDistance,
             confidence: confidence
+        )
+    }
+    
+    // 어떤 그룹에도 속하지 못한 단독 사진들을 Extra 그룹으로 생성
+    private func handleExtraPhotos(
+        analyzedPhotos: [AnalyzedPhoto],
+        processedImageSet: Set<Int>
+    ) -> SimilarPhotoGroup? {
+        var extraPhotos: [Photo] = []
+        
+        for idx in 0..<analyzedPhotos.count {
+            if !processedImageSet.contains(idx) {
+                extraPhotos.append(analyzedPhotos[idx].photo)
+            }
+        }
+        
+        // Extra 사진이 없으면 nil 반환
+        guard !extraPhotos.isEmpty else { return nil }
+        
+        // Extra 그룹 생성 (confidence와 averageDistance는 0)
+        return SimilarPhotoGroup(
+            photos: extraPhotos,
+            averageDistance: 0.0,
+            confidence: 0.0
         )
     }
 }
