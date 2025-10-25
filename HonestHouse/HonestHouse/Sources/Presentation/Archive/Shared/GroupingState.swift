@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-enum GroupingState {
+enum GroupingState: Equatable {
     case idle
     case loading
     case success([SimilarPhotoGroup])
