@@ -26,13 +26,14 @@ class VisionManager {
     // 각 이미지의 특징을 Vision으로 추출
     private func extractFeatures(from photos: [Photo]) async throws -> [AnalyzedPhoto] {
         var features: [AnalyzedPhoto] = []
+        var errorInfos: [(photo: Photo, error: Error)] = []
         
         for photo in photos {
             do {
                 let uiImage = try await imageLoader.fetchUIImage(from: photo.url)
                 
                 guard let cgImage = uiImage.cgImage else {
-                    print("fail to get CGImage from UIImage from URL: \(photo.url)")
+                    errorInfos.append((photo, VisionError.cgImageConversion(url: photo.url)))
                     continue
                 }
                 
@@ -42,7 +43,7 @@ class VisionManager {
                 try handler.perform([request])
                 
                 guard let observation = request.results?.first else {
-                    print("fail to get VNFeaturePrintObservation for URL: \(photo.url)")
+                    errorInfos.append((photo, VisionError.observation(url: photo.url)))
                     continue
                 }
                 
@@ -53,11 +54,18 @@ class VisionManager {
                     )
                 )
             }
-            catch {
-               print("Error fetching or analyzing image from \(photo.url): \(error.localizedDescription)")
-               continue
-           }
+            catch let error {
+                errorInfos.append((photo, VisionError.imageFetching(url: photo.url, underlyingError: error)))
+                continue
+            }
         }
+        
+        if !errorInfos.isEmpty {
+            let failedPhotos = errorInfos.map { $0.photo }
+            let errors = errorInfos.map{ $0.error }
+            throw VisionError.partialAnalysis(failedPhotos: failedPhotos, errors: errors)
+        }
+        
         return features
     }
     
@@ -156,7 +164,7 @@ class VisionManager {
         
         return sumDistance / Float(currentGroupIndexes.count)
     }
-
+    
     private func makeSimilarGroup(
         photos: [Photo],
         distances: [Float],

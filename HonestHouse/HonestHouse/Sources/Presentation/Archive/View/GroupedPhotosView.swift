@@ -22,12 +22,8 @@ struct GroupedPhotosView: View {
     var body: some View {
         NavigationStack {
             switch vm.state {
-            case .idle:
-                Text("그룹화를 시작하려면 잠시 기다려주세요.")
-                    .foregroundColor(.gray)
-            case .loading:
-                ProgressView("이미지 그룹화 중...")
-                    .progressViewStyle(.circular)
+            case .idle, .loading:
+                ProgressView()
             case .success(let groupedPhotos):
                 ScrollView {
                     LazyVGrid(columns: columns, spacing: 10) {
@@ -42,8 +38,8 @@ struct GroupedPhotosView: View {
                     .padding(.horizontal, 16)
                     .padding(.vertical, 32)
                 }
-            case .failure(let error):
-                Text("오류 발생: \(error.localizedDescription)")
+            case .failure(let groupingError):
+                Text("Error: \(groupingError.localizedDescription)")
                     .foregroundColor(.red)
             }
         }

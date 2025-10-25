@@ -11,5 +11,5 @@ enum GroupingState {
     case idle
     case loading
     case success([SimilarPhotoGroup])
-    case failure(Error)
+    case failure(GroupingError)
 }

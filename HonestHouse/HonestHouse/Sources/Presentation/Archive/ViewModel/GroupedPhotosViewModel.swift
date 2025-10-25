@@ -29,9 +29,10 @@ class GroupedPhotosViewModel {
             do {
                 let result = try await visionManager.analyzeImages(photosFromSelection)
                 state = .success(result)
+            } catch let error as VisionError {
+                state = .failure(GroupingError.from(visionError: error))
             } catch {
-                state = .failure(error)
-                print("Error while grouping:\(error.localizedDescription)")
+                state = .failure(.unknown)
             }
         }
     }
