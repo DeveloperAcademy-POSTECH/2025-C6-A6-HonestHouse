@@ -29,19 +29,18 @@ struct GroupedPhotosView: View {
                 ProgressView("이미지 그룹화 중...")
                     .progressViewStyle(.circular)
             case .success(let groupedPhotos):
-                if groupedPhotos.isEmpty {
-                    Text("그룹화된 사진이 없습니다.")
-                        .foregroundColor(.gray)
-                } else {
-                    ScrollView {
-                        LazyVGrid(columns: columns, spacing: 10) {
-                            ForEach(groupedPhotos) { group in
-                                groupedPhotosGridCellView(group: group)
-                            }
+                ScrollView {
+                    LazyVGrid(columns: columns, spacing: 10) {
+                        ForEach(groupedPhotos) { group in
+                            GroupedPhotosGridCellView(
+                                group: group,
+                                selectedPhotosInGroup: vm.selectedPhotosInGroup,
+                                onTapGroupedPhoto: toggleGroupedPhotoView
+                            )
                         }
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 32)
                     }
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 32)
                 }
             case .failure(let error):
                 Text("오류 발생: \(error.localizedDescription)")
@@ -50,35 +49,6 @@ struct GroupedPhotosView: View {
         }
         .task {
             vm.startGrouping()
-        }
-    }
-    
-    private func groupedPhotosGridCellView(group: SimilarPhotoGroup) -> some View {
-        NavigationLink(
-            destination: GroupedPhotosDetailView(
-                groupedPhotos: group,
-                finalSelectedPhotos: vm.selectedPhotosInGroup,
-                onTapGroupedPhoto: toggleGroupedPhotoView)
-        ) {
-            if let firstPhoto = group.photos.first {
-                KFImage(URL(string: firstPhoto.url))
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-                    .frame(width: 160, height: 120)
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
-                    .overlay(
-                        ZStack(alignment: .topTrailing) {
-                            Text("\(group.photos.count)")
-                                .font(.caption)
-                                .fontWeight(.bold)
-                                .foregroundColor(.white)
-                                .padding(6)
-                                .background(Color.black.opacity(0.7))
-                                .clipShape(Circle())
-                                .padding(8)
-                        }
-                    )
-            }
         }
     }
     
