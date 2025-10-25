@@ -126,3 +126,15 @@ extension PhotoSelectionViewModel {
         }
     }
 }
+class PhotoSelectionViewModel {
+    let mockPhotos = Photo.mockPhotos(count: 20)
+    var selectedPhotos: [Photo] = []
+    
+    func toggleGridCell(for photo: Photo) {
+        if let index = selectedPhotos.firstIndex(where: { $0.url == photo.url }) {
+            selectedPhotos.remove(at: index)
+        } else {
+            selectedPhotos.append(photo)
+        }
+    }
+}

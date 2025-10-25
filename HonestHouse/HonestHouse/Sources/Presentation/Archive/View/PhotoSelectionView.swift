@@ -9,6 +9,8 @@ import SwiftUI
 import Kingfisher
 
 struct PhotoSelectionView: View {
+    @State private var vm = PhotoSelectionViewModel()
+    
     let columnCount: Int = 3
     
     var columns: [GridItem] {
@@ -21,6 +23,14 @@ struct PhotoSelectionView: View {
     var body: some View {
         NavigationStack {
             ZStack {
+                ScrollView {
+                    LazyVGrid(columns: columns, spacing: 2) {
+                        ForEach(vm.mockPhotos) { photo in
+                            SelectionGridCellView(
+                                item: photo,
+                                isSelected: vm.selectedPhotos.contains(where: { $0.url == photo.url }),
+                                onTapSelectionGridCell: { vm.toggleGridCell(for: photo) }
+                            )
                 VStack {
                     Button("Refresh") {
                         Task {
@@ -52,21 +62,19 @@ struct PhotoSelectionView: View {
                 
                 VStack {
                     Spacer()
-                    // TODO: 사진이 한 장 이상 선택됐을 때 push 가능하게 수정
-                    NavigationLink(
-                        destination: GroupedPhotosView(selectedPhotos: selectedPhotos),
-                    ) {
-                        Text("완료")
-                            .font(.title3)
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 20)
-                            .background(Color.gray)
-                            .foregroundStyle(Color.black)
-                            .clipShape(RoundedRectangle(cornerRadius: 12))
+                    if !vm.selectedPhotos.isEmpty {
+                        NavigationLink(destination: GroupedPhotosView(selectedPhotos: vm.selectedPhotos)) {
+                            Text("완료")
+                                .font(.title3)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 20)
+                                .background(Color.gray)
+                                .foregroundStyle(Color.black)
+                                .clipShape(RoundedRectangle(cornerRadius: 12))
+                        }
+                        .padding(.horizontal, 16)
+                        .padding(.bottom, 12)
                     }
-                    .disabled(selectedPhotos.isEmpty)
-                    .padding(.horizontal, 16)
-                    .padding(.bottom, 12)
                 }
             }
             .navigationTitle("카메라 이름")
@@ -74,15 +82,6 @@ struct PhotoSelectionView: View {
             .task {
                 await viewModel.fetchFirstPageImage()
             }
-        }
-    }
-    
-    //TODO: ViewModel 생성 후 이동
-    private func toggleGridCell(for photo: Photo) {
-        if let index = selectedPhotos.firstIndex(where: { $0.url == photo.url }) {
-            selectedPhotos.remove(at: index)
-        } else {
-            selectedPhotos.append(photo)
         }
     }
 }
