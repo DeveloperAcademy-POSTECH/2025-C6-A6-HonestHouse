@@ -11,15 +11,28 @@ import SwiftUI
 class GroupedPhotosViewModel {
     private let visionManager = VisionManager()
     
-    var photosFromSelection = Photo.mockPhotos(count: 20)
-    var groupedPhotos: [SimilarPhotoGroup] = []
+    var photosFromSelection: [Photo]
     var selectedPhotosInGroup: [Photo] = []
+    var state: GroupingState = .idle
     
     init(selectedPhotos: [Photo]) {
         self.photosFromSelection = selectedPhotos
+    }
+    
+    func startGrouping() {
+        if case .loading = state { return }
+        if case .success = state { return }
+        
+        state = .loading
         
         Task {
-            self.groupedPhotos = try await visionManager.analyzeImages(photosFromSelection)
+            do {
+                let result = try await visionManager.analyzeImages(photosFromSelection)
+                state = .success(result)
+            } catch {
+                state = .failure(error)
+                print("Error while grouping:\(error.localizedDescription)")
+            }
         }
     }
 }

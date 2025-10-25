@@ -21,15 +21,35 @@ struct GroupedPhotosView: View {
     
     var body: some View {
         NavigationStack {
-            ScrollView {
-                LazyVGrid(columns: columns, spacing: 10) {
-                    ForEach(vm.groupedPhotos) { group in
-                        groupedPhotosGridCellView(group: group)
+            switch vm.state {
+            case .idle:
+                Text("그룹화를 시작하려면 잠시 기다려주세요.")
+                    .foregroundColor(.gray)
+            case .loading:
+                ProgressView("이미지 그룹화 중...")
+                    .progressViewStyle(.circular)
+            case .success(let groupedPhotos):
+                if groupedPhotos.isEmpty {
+                    Text("그룹화된 사진이 없습니다.")
+                        .foregroundColor(.gray)
+                } else {
+                    ScrollView {
+                        LazyVGrid(columns: columns, spacing: 10) {
+                            ForEach(groupedPhotos) { group in
+                                groupedPhotosGridCellView(group: group)
+                            }
+                        }
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 32)
                     }
                 }
-                .padding(.horizontal, 16)
-                .padding(.vertical, 32)
+            case .failure(let error):
+                Text("오류 발생: \(error.localizedDescription)")
+                    .foregroundColor(.red)
             }
+        }
+        .task {
+            vm.startGrouping()
         }
     }
     
