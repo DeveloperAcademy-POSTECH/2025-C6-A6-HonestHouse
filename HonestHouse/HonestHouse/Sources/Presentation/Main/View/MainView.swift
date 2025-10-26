@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct MainView: View {
-    @State var viewModel: MainViewModel = .init()
+    @State var vm: MainViewModel = .init()
     
     var body: some View {
         VStack {
@@ -40,8 +40,8 @@ struct MainView: View {
     
     
     private func segmentedControlView() -> some View {
-        Picker("", selection: $viewModel.selectedSegment) {
-            ForEach(viewModel.segments, id: \.self) {
+        Picker("", selection: $vm.selectedSegment) {
+            ForEach(vm.segments, id: \.self) {
                 Text($0.displayName)
                     .font(.system(size: 14, weight: .semibold))
             }
