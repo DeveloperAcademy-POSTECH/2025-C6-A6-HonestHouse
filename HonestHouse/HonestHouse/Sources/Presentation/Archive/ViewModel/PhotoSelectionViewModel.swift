@@ -81,6 +81,17 @@ extension PhotoSelectionViewModel {
         presentDirectory = dirName
     }
     
+    /// 1페이지 불러오기
+    func fetchFirstPageImage() async {
+        await setPresentStorage()
+        guard let storage = presentStorage else { return }
+        
+        await setPresentDirectory(storage: storage)
+        
+        resetPaging()
+        await loadCurrentPage()
+    }
+    
     /// paging처리 초기화
     func resetPaging() {
         currentPage = 1
@@ -102,7 +113,7 @@ extension PhotoSelectionViewModel {
             storage: storage,
             directory: directory,
             type: "jpeg",
-            kind: "thumbnail",
+            kind: "list",
             page: currentPage
         )
         
