@@ -9,15 +9,18 @@ import Foundation
 
 protocol ServiceType {
     var shootingSettingsService: ShootingSettingsServiceType { get set }
+    var imageOperationsService: ImageOperationsServiceType { get set }
     var visionManager: VisionManagerType { get }
 }
 
 class Services: ServiceType {
     var shootingSettingsService: ShootingSettingsServiceType
+    var imageOperationsService: ImageOperationsServiceType
     var visionManager: VisionManagerType
     
     init() {
         self.shootingSettingsService = ShootingSettingsService()
+        self.imageOperationsService = ImageOperationsService()
         self.visionManager = VisionManager()
     }
 }
