@@ -21,7 +21,6 @@ final class PhotoSelectionViewModel {
     var hasMore: Bool = true
     var entireContentUrls: [String] = []
     
-    let mockPhotos = Photo.mockPhotos(count: 20)
     var selectedPhotos: [Photo] = []
     
     private var imageOperationsService: ImageOperationsServiceType?

@@ -26,11 +26,9 @@ struct PhotoSelectionView: View {
             }
             .navigationTitle("카메라 이름")
             .navigationBarTitleDisplayMode(.large)
-//            .task {
-//                await vm.fetchFirstPageImage()
-//            }
             .task {
                 vm.configure(container: container)
+                await vm.fetchFirstPageImage()
             }
         }
     }
@@ -38,31 +36,22 @@ struct PhotoSelectionView: View {
     private func photoSelectionGridView() -> some View {
         ScrollView {
             LazyVGrid(columns: columns, spacing: 2) {
-                /// 현재는 MockPhoto로 대체
-//                ForEach(vm.entireContentUrls.map { Photo(url: $0) }) { photo in
-//                    SelectionGridCellView(
-//                        item: photo,
-//                        isSelected: vm.selectedPhotos.contains(where: { $0.id == photo.id }),
-//                        onTapSelectionGridCell: { vm.toggleGridCell(for: photo) }
-//                    )
-//                }
-                
-                ForEach(vm.mockPhotos) { photo in
+                ForEach(vm.entireContentUrls.map { Photo(url: $0) }) { photo in
                     SelectionGridCellView(
                         item: photo,
                         isSelected: vm.selectedPhotos.contains(where: { $0.id == photo.id }),
                         onTapSelectionGridCell: { vm.toggleGridCell(for: photo) }
                     )
                 }
-                    
-//                if vm.hasMore {
-//                    ProgressView()
-//                        .frame(maxWidth: .infinity)
-//                        .padding(.vertical, 12)
-//                        .task {
-//                            await vm.loadCurrentPage()
-//                        }
-//                }
+                
+                if vm.hasMore {
+                    ProgressView()
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 12)
+                        .task {
+                            await vm.loadCurrentPage()
+                        }
+                }
             }
             .padding(.horizontal, 2)
         }
