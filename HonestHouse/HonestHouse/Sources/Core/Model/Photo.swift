@@ -12,11 +12,11 @@ struct Photo: Identifiable, SelectableItem {
     var url: String
     var mediaType: MediaType
     
-    var thumbnailURL: String? {
+    var thumbnailURL: String {
         "\(url)?kind=thumbnail"
     }
     
-    var displayURL: String? {
+    var displayURL: String {
         "\(url)?kind=display"
     }
     

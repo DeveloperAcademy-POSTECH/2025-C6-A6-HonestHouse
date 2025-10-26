@@ -16,9 +16,9 @@ struct SelectionGridCellView<Item: SelectableItem>: View {
     var body: some View {
         ZStack(alignment: .bottomTrailing) {
             NavigationLink(destination: PhotoSelectionDetailView(item: item)) {
-                KFImage(URL(string: item.url))
+                KFImage(URL(string: item.thumbnailURL))
                     .resizable()
-                    .aspectRatio(1, contentMode: .fill)
+                    .aspectRatio(1, contentMode: .fit)
                     .clipped()
                     .overlay(isSelected ? Color.black.opacity(0.3) : Color.clear)
             }
