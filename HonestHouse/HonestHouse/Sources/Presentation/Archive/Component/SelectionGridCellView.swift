@@ -24,23 +24,23 @@ struct SelectionGridCellView<Item: SelectableItem>: View {
             }
             
             Button(action: onTapSelectionGridCell) {
-                if isSelected {
+                Group {
                     ZStack(alignment: .bottomTrailing) {
-                        Circle()
-                            .fill(Color.white)
-                            .frame(width: 24, height: 24)
-                        
-                        Image(systemName: "checkmark.circle.fill")
-                            .foregroundColor(.blue)
-                            .font(.system(size: 24))
+                        if isSelected {
+                            Circle()
+                                .fill(Color.white)
+                            
+                            Image(systemName: "checkmark.circle.fill")
+                                .foregroundColor(.blue)
+                                .font(.system(size: 24))
+                        } else { Circle().fill(Color.white) }
                     }
-                } else {
-                    Circle()
-                        .fill(Color.white)
-                        .frame(width: 24, height: 24)
                 }
+                .frame(width: 24, height: 24)
+                .padding(.top, 24)
+                .padding(.leading, 24)
             }
-            .frame(width: 66, height: 66)
+            .frame(width: 80, height: 80)
             .contentShape(Rectangle())
         }
     }

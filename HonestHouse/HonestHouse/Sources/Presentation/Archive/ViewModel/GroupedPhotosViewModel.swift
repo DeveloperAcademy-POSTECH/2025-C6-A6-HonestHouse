@@ -33,7 +33,7 @@ class GroupedPhotosViewModel {
         
         Task {
             do {
-                let result = try await visionManager.analyzeImages(photosFromSelection, threshold: 8.0)
+                let result = try await visionManager.analyzeImages(photosFromSelection, threshold: 0.8)
                 state = .success(result)
             } catch let error as VisionError {
                 state = .failure(GroupingError.from(visionError: error))
