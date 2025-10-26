@@ -24,7 +24,7 @@ struct PhotoSelectionView: View {
                 VStack {
                     Button("Refresh") {
                         Task {
-                            await viewModel.loadCurrentPage()
+                            await viewModel.fetchFirstPageImage()
                         }
                     }
                     ScrollView {
@@ -36,6 +36,7 @@ struct PhotoSelectionView: View {
                                     onTapSelectionGridCell: { toggleGridCell(for: photo) }
                                 )
                             }
+                            
                             if viewModel.hasMore {
                                 ProgressView()
                                     .frame(maxWidth: .infinity)
