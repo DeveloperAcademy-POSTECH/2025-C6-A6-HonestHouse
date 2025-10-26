@@ -25,24 +25,12 @@ struct GroupedPhotosView: View {
     
     var body: some View {
         NavigationStack {
-            switch vm.state {
+            switch vm.groupingState {
             case .idle, .loading:
                 ProgressView()
             case .success(let groupedPhotos):
-                ScrollView {
-                    LazyVGrid(columns: columns, spacing: 10) {
-                        ForEach(groupedPhotos) { group in
-                            GroupedPhotosGridCellView(
-                                group: group,
-                                selectedPhotosInGroup: vm.selectedPhotosInGroup,
-                                onTapGroupedPhoto: toggleGroupedPhotoView
-                            )
-                        }
-                    }
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 32)
-                }
-            case .failure(let groupingError):
+                groupedPhotosGridView(groupedPhotos: groupedPhotos)
+            case .failure(_):
                 Color.clear
             }
             
@@ -55,13 +43,29 @@ struct GroupedPhotosView: View {
             vm.configure(container: container)
             vm.startGrouping()
         }
-        .onChange(of: vm.state) { _, newState in
+        .onChange(of: vm.groupingState) { _, newState in
             if case .failure(let groupingError) = newState {
                 toastMessage = "오류 발생: \(groupingError.localizedDescription)"
                 showToast = true
             } else {
                 showToast = false
             }
+        }
+    }
+    
+    private func groupedPhotosGridView(groupedPhotos: [SimilarPhotoGroup]) -> some View {
+        ScrollView {
+            LazyVGrid(columns: columns, spacing: 10) {
+                ForEach(groupedPhotos) { group in
+                    GroupedPhotosGridCellView(
+                        group: group,
+                        selectedPhotosInGroup: vm.selectedPhotosInGroup,
+                        onTapGroupedPhoto: toggleGroupedPhotoView
+                    )
+                }
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 32)
         }
     }
     

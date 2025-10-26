@@ -10,11 +10,11 @@ import SwiftUI
 @MainActor
 @Observable
 class GroupedPhotosViewModel {
-    private var visionManager: VisionManagerType!
+    private var visionManager: VisionManagerType?
     
     var photosFromSelection: [Photo]
     var selectedPhotosInGroup: [Photo] = []
-    var state: GroupingState = .idle
+    var groupingState: GroupingState = .idle
     
     init(selectedPhotos: [Photo]) {
         self.photosFromSelection = selectedPhotos
@@ -26,19 +26,24 @@ class GroupedPhotosViewModel {
     }
     
     func startGrouping() {
-        if case .loading = state { return }
-        if case .success = state { return }
+        guard let visionManager else {
+            groupingState = .failure(.unknown)
+            return
+        }
         
-        state = .loading
+        if case .loading = groupingState { return }
+        if case .success = groupingState { return }
+        
+        groupingState = .loading
         
         Task {
             do {
                 let result = try await visionManager.analyzeImages(photosFromSelection, threshold: 0.8)
-                state = .success(result)
+                groupingState = .success(result)
             } catch let error as VisionError {
-                state = .failure(GroupingError.from(visionError: error))
+                groupingState = .failure(GroupingError.from(visionError: error))
             } catch {
-                state = .failure(.unknown)
+                groupingState = .failure(.unknown)
             }
         }
     }
