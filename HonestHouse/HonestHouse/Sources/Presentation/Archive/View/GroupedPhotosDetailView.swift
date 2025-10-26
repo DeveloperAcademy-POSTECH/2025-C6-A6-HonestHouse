@@ -9,7 +9,7 @@ import SwiftUI
 import Kingfisher
 
 struct GroupedPhotosDetailView: View {
-    let groupedPhotos: GroupedPhotos
+    let groupedPhotos: SimilarPhotoGroup
     let finalSelectedPhotos: [Photo]
     let onTapGroupedPhoto: (Photo) -> Void
     

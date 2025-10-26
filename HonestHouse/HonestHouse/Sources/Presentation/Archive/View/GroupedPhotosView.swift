@@ -8,13 +8,12 @@
 import SwiftUI
 import Kingfisher
 
-struct GroupedPhotos: Identifiable {
-    let id = UUID()
-    let photos: [Photo]
-}
-
 struct GroupedPhotosView: View {
     @State private var vm: GroupedPhotosViewModel
+    @EnvironmentObject var container: DIContainer
+    
+    @State private var showToast: Bool = false
+    @State private var toastMessage: String = ""
     
     var columns: [GridItem] {
         Array(repeating: GridItem(.flexible()), count: 2)
@@ -26,44 +25,47 @@ struct GroupedPhotosView: View {
     
     var body: some View {
         NavigationStack {
-            ScrollView {
-                LazyVGrid(columns: columns, spacing: 10) {
-                    ForEach(vm.groupedPhotos) { group in
-                        groupedPhotosGridCellView(group: group)
-                    }
-                }
-                .padding(.horizontal, 16)
-                .padding(.vertical, 32)
+            switch vm.groupingState {
+            case .idle, .loading:
+                ProgressView()
+            case .success(let groupedPhotos):
+                groupedPhotosGridView(groupedPhotos: groupedPhotos)
+            case .failure(_):
+                Color.clear
+            }
+            
+            if showToast {
+                ToastView(message: toastMessage, isShowing: $showToast)
+                    .transition(.move(edge: .bottom))
+            }
+        }
+        .task {
+            vm.configure(container: container)
+            vm.startGrouping()
+        }
+        .onChange(of: vm.groupingState) { _, newState in
+            if case .failure(let groupingError) = newState {
+                toastMessage = "오류 발생: \(groupingError.localizedDescription)"
+                showToast = true
+            } else {
+                showToast = false
             }
         }
     }
     
-    private func groupedPhotosGridCellView(group: GroupedPhotos) -> some View {
-        NavigationLink(
-            destination: GroupedPhotosDetailView(
-                groupedPhotos: group,
-                finalSelectedPhotos: vm.selectedPhotosInGroup,
-                onTapGroupedPhoto: toggleGroupedPhotoView)
-        ) {
-            if let firstPhoto = group.photos.first {
-                KFImage(URL(string: firstPhoto.url))
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-                    .frame(width: 160, height: 120)
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
-                    .overlay(
-                        ZStack(alignment: .topTrailing) {
-                            Text("\(group.photos.count)")
-                                .font(.caption)
-                                .fontWeight(.bold)
-                                .foregroundColor(.white)
-                                .padding(6)
-                                .background(Color.black.opacity(0.7))
-                                .clipShape(Circle())
-                                .padding(8)
-                        }
+    private func groupedPhotosGridView(groupedPhotos: [SimilarPhotoGroup]) -> some View {
+        ScrollView {
+            LazyVGrid(columns: columns, spacing: 10) {
+                ForEach(groupedPhotos) { group in
+                    GroupedPhotosGridCellView(
+                        group: group,
+                        selectedPhotosInGroup: vm.selectedPhotosInGroup,
+                        onTapGroupedPhoto: toggleGroupedPhotoView
                     )
+                }
             }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 32)
         }
     }
     

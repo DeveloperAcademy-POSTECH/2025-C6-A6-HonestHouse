@@ -7,8 +7,7 @@
 
 import Foundation
 
-@Observable
-class DIContainer {
+class DIContainer: ObservableObject {
     var services: ServiceType
     
     init(

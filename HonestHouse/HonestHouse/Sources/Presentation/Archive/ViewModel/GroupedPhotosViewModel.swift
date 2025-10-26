@@ -7,22 +7,44 @@
 
 import SwiftUI
 
+@MainActor
 @Observable
 class GroupedPhotosViewModel {
-    var photosFromSelection = Photo.mockPhotos(count: 20)
-    var groupedPhotos: [GroupedPhotos] = []
+    private var visionManager: VisionManagerType?
+    
+    var photosFromSelection: [Photo]
     var selectedPhotosInGroup: [Photo] = []
+    var groupingState: GroupingState = .idle
     
     init(selectedPhotos: [Photo]) {
         self.photosFromSelection = selectedPhotos
-        groupPhotosTemporarily()
     }
     
-    func groupPhotosTemporarily() {
-        let chunkSize = 5
-        let chunks = stride(from: 0, to: photosFromSelection.count, by: chunkSize).map {
-            Array(photosFromSelection[$0..<min($0 + chunkSize, photosFromSelection.count)])
+    func configure(container: DIContainer) {
+        guard self.visionManager == nil else { return }
+        self.visionManager = container.services.visionManager
+    }
+    
+    func startGrouping() {
+        guard let visionManager else {
+            groupingState = .failure(.unknown)
+            return
         }
-        self.groupedPhotos = chunks.map { GroupedPhotos(photos: $0)}
+        
+        if case .loading = groupingState { return }
+        if case .success = groupingState { return }
+        
+        groupingState = .loading
+        
+        Task {
+            do {
+                let result = try await visionManager.analyzeImages(photosFromSelection, threshold: 0.8)
+                groupingState = .success(result)
+            } catch let error as VisionError {
+                groupingState = .failure(GroupingError.from(visionError: error))
+            } catch {
+                groupingState = .failure(.unknown)
+            }
+        }
     }
 }
