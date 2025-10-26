@@ -17,7 +17,6 @@ struct MainView: View {
             segmentedControlView()
             Spacer().frame(height: 27)
             // TODO: 트라이샷, 프리셋 뷰 연결 필요
-            }
         }
         .padding(.horizontal, 16)
     }
