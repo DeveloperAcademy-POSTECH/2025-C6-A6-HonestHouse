@@ -7,9 +7,10 @@
 
 import SwiftUI
 
+@MainActor
 @Observable
 class GroupedPhotosViewModel {
-    private let visionManager = VisionManager()
+    private var visionManager: VisionManagerType!
     
     var photosFromSelection: [Photo]
     var selectedPhotosInGroup: [Photo] = []
@@ -17,6 +18,11 @@ class GroupedPhotosViewModel {
     
     init(selectedPhotos: [Photo]) {
         self.photosFromSelection = selectedPhotos
+    }
+    
+    func configure(container: DIContainer) {
+        guard self.visionManager == nil else { return }
+        self.visionManager = container.services.visionManager
     }
     
     func startGrouping() {
@@ -27,7 +33,7 @@ class GroupedPhotosViewModel {
         
         Task {
             do {
-                let result = try await visionManager.analyzeImages(photosFromSelection)
+                let result = try await visionManager.analyzeImages(photosFromSelection, threshold: 8.0)
                 state = .success(result)
             } catch let error as VisionError {
                 state = .failure(GroupingError.from(visionError: error))

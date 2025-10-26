@@ -8,12 +8,12 @@
 import SwiftUI
 import Vision
 
-class VisionManager {
+class VisionManager: VisionManagerType {
     private let imageLoader = ImageLoader()
     
     public func analyzeImages(
         _ photos: [Photo],
-        threshold: Float = 0.8
+        threshold: Float
     ) async throws -> [SimilarPhotoGroup] {
         let features = try await extractFeatures(from: photos)
         

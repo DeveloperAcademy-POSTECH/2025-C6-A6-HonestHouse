@@ -10,6 +10,8 @@ import Kingfisher
 
 struct GroupedPhotosView: View {
     @State private var vm: GroupedPhotosViewModel
+    @EnvironmentObject var container: DIContainer
+    
     @State private var showToast: Bool = false
     @State private var toastMessage: String = ""
     
@@ -49,7 +51,10 @@ struct GroupedPhotosView: View {
                     .transition(.move(edge: .bottom))
             }
         }
-        .task { vm.startGrouping() }
+        .task {
+            vm.configure(container: container)
+            vm.startGrouping()
+        }
         .onChange(of: vm.state) { _, newState in
             if case .failure(let groupingError) = newState {
                 toastMessage = "오류 발생: \(groupingError.localizedDescription)"
