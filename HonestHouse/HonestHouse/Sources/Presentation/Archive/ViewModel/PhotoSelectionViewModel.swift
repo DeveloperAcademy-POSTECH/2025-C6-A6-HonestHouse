@@ -24,13 +24,23 @@ final class PhotoSelectionViewModel {
     let mockPhotos = Photo.mockPhotos(count: 20)
     var selectedPhotos: [Photo] = []
     
-    let imageOperationsService = ImageOperationsService()
+    private var imageOperationsService: ImageOperationsServiceType?
     
 }
 
 extension PhotoSelectionViewModel {
+    
+    func configure(container: DIContainer) {
+        guard self.imageOperationsService == nil else { return }
+        self.imageOperationsService = container.services.imageOperationsService
+    }
+    
     /// storageListResponse를 받아와서 storageList로 변환
     func getStorageList() async {
+        guard let imageOperationsService = imageOperationsService else {
+            return
+        }
+        
         do {
             let storageListResponse = try await imageOperationsService.getStorageList()
             storageList = storageListResponse.toEntity()
@@ -41,6 +51,10 @@ extension PhotoSelectionViewModel {
     
     /// directoryListResponse를 받아와서 directoryList로 변환
     func getDirectoryList(storage: String) async {
+        guard let imageOperationsService = imageOperationsService else {
+            return
+        }
+        
         do {
             let directoryListResponse = try await imageOperationsService.getDirectoryList(storage: storage)
             directoryList = directoryListResponse.toEntity()
@@ -51,6 +65,10 @@ extension PhotoSelectionViewModel {
     
     /// contentListResponse를 받아와서 contentList로 변환
     func getContentList(storage: String, directory: String, type: String, kind: String, page: Int) async {
+        guard let imageOperationsService = imageOperationsService else {
+            return
+        }
+        
         do {
             let contentListResponse = try await imageOperationsService.getContentList(storage: storage, directory: directory, type: type, kind: kind, page: page)
             contentList = contentListResponse.toEntity()

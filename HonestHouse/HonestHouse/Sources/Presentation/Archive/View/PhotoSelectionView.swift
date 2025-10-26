@@ -16,6 +16,7 @@ struct PhotoSelectionView: View {
     }
     
     @State var vm: PhotoSelectionViewModel = .init()
+    @EnvironmentObject var container: DIContainer
     
     var body: some View {
         NavigationStack {
@@ -28,6 +29,9 @@ struct PhotoSelectionView: View {
 //            .task {
 //                await vm.fetchFirstPageImage()
 //            }
+            .task {
+                vm.configure(container: container)
+            }
         }
     }
     
