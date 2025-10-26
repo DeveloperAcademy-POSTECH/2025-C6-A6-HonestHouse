@@ -9,9 +9,14 @@ import SwiftUI
 
 @main
 struct HonestHouseApp: App {
+    
+    @State var container = DIContainer(services: Services())
+    
     var body: some Scene {
         WindowGroup {
             PhotoSelectionView()
         }
     }
 }
+
+

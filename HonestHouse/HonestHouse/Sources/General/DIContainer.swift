@@ -6,3 +6,14 @@
 //
 
 import Foundation
+
+@Observable
+class DIContainer {
+    var services: ServiceType
+    
+    init(
+        services: ServiceType
+    ) {
+        self.services = services
+    }
+}
