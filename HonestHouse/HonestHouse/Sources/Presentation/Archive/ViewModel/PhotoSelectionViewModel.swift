@@ -21,7 +21,11 @@ final class PhotoSelectionViewModel {
     var hasMore: Bool = true
     var entireContentUrls: [String] = []
     
+    let mockPhotos = Photo.mockPhotos(count: 20)
+    var selectedPhotos: [Photo] = []
+    
     let imageOperationsService = ImageOperationsService()
+    
 }
 
 extension PhotoSelectionViewModel {
@@ -125,10 +129,6 @@ extension PhotoSelectionViewModel {
             hasMore = false
         }
     }
-}
-class PhotoSelectionViewModel {
-    let mockPhotos = Photo.mockPhotos(count: 20)
-    var selectedPhotos: [Photo] = []
     
     func toggleGridCell(for photo: Photo) {
         if let index = selectedPhotos.firstIndex(where: { $0.id == photo.id }) {
