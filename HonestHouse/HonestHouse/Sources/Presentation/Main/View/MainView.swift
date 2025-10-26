@@ -40,16 +40,13 @@ struct MainView: View {
     
     
     private func segmentedControlView() -> some View {
-        VStack {
-            Picker("", selection: $viewModel.selectedSegment) {
-                ForEach(viewModel.segments, id: \.self) {
-                    Text($0.displayName)
-                        .font(.system(size: 14, weight: .semibold))
-                }
-                .padding(4)
+        Picker("", selection: $viewModel.selectedSegment) {
+            ForEach(viewModel.segments, id: \.self) {
+                Text($0.displayName)
+                    .font(.system(size: 14, weight: .semibold))
             }
-            .pickerStyle(.segmented)
         }
+        .pickerStyle(.segmented)
     }
 }
 
