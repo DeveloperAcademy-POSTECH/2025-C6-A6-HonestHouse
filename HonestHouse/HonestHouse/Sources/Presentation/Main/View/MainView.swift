@@ -27,13 +27,13 @@ struct MainView: View {
             Button {
                 // TODO: 카메라 설정 뷰 연결
             } label: {
-                Image(systemName: "camera.badge.ellipsis")
+                Image(.cameraAdd)
             }
             Spacer()
             Button {
                 // TODO: 아카이빙 뷰 연결
             } label: {
-                Image(systemName: "square.grid.2x2")
+                Image(.squareGrid)
             }
         }
         .foregroundStyle(.black)
