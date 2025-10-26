@@ -7,8 +7,8 @@
 
 import SwiftUI
 
-struct SimilarPhotoGroup: Identifiable {
-    let id = UUID()
+struct SimilarPhotoGroup: Identifiable, Equatable {
+    let id: UUID = UUID()
     let photos: [Photo]
     let averageDistance: Float
     let confidence: Float

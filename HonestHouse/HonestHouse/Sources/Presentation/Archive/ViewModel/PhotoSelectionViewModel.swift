@@ -131,7 +131,7 @@ class PhotoSelectionViewModel {
     var selectedPhotos: [Photo] = []
     
     func toggleGridCell(for photo: Photo) {
-        if let index = selectedPhotos.firstIndex(where: { $0.url == photo.url }) {
+        if let index = selectedPhotos.firstIndex(where: { $0.id == photo.id }) {
             selectedPhotos.remove(at: index)
         } else {
             selectedPhotos.append(photo)

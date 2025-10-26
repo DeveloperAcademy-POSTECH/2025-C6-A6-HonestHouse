@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct Photo: Identifiable, SelectableItem {
+struct Photo: Identifiable, Equatable, SelectableItem {
     let id = UUID()
     var url: String
     var mediaType: MediaType

@@ -23,7 +23,7 @@ import Foundation
      }
  }
 
-extension GroupingError {
+extension GroupingError: Equatable {
     static func from(visionError: VisionError) -> GroupingError {
         switch visionError {
         case .imageFetching(url: _, underlyingError: _):
