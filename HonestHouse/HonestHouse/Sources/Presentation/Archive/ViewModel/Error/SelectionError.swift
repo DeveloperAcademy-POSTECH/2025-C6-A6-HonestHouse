@@ -12,7 +12,7 @@ enum SelectionError: Error, LocalizedError {
     case cameraUnavailable   // 카메라 연결 문제
     case generic             // 기타 오류
     
-    var errorDescription: String {
+    var errorDescription: String? {
         switch self {
         case .cameraBusy:
             return "카메라가 사용 중입니다. 잠시 후 다시 시도해주세요."

@@ -18,9 +18,22 @@
 		21C47E2E2E9AA5FC00FB6029 /* HonestHouse.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HonestHouse.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		CFFBFB8D2EAF7FF5006CA467 /* Exceptions for "HonestHouse" folder in "HonestHouse" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 21C47E2D2E9AA5FC00FB6029 /* HonestHouse */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		21C47E302E9AA5FC00FB6029 /* HonestHouse */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				CFFBFB8D2EAF7FF5006CA467 /* Exceptions for "HonestHouse" folder in "HonestHouse" target */,
+			);
 			path = HonestHouse;
 			sourceTree = "<group>";
 		};
@@ -294,7 +307,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.honesthouse;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "match Development com.honesthouse 1761025458";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "match Development com.honesthouse";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -327,7 +340,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.honesthouse;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "match Development com.honesthouse 1761025458";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "match Development com.honesthouse";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
