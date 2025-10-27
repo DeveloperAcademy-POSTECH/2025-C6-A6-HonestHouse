@@ -11,10 +11,13 @@ import SwiftUI
 @Observable
 class GroupedPhotosViewModel {
     private var visionManager: VisionManagerType?
+    private var photoManager: PhotoManagerType?
     
     var photosFromSelection: [Photo]
     var selectedPhotosInGroup: [Photo] = []
+    
     var groupingState: GroupingState = .idle
+    var savingState: SavingState = .idle
     
     init(selectedPhotos: [Photo]) {
         self.photosFromSelection = selectedPhotos
@@ -23,6 +26,9 @@ class GroupedPhotosViewModel {
     func configure(container: DIContainer) {
         guard self.visionManager == nil else { return }
         self.visionManager = container.services.visionManager
+        
+        guard self.photoManager == nil else { return }
+        self.photoManager = container.services.photoManager
     }
     
     func startGrouping() {
@@ -45,6 +51,32 @@ class GroupedPhotosViewModel {
             } catch {
                 groupingState = .failure(.unknown)
             }
+        }
+    }
+    
+    func saveSelectedPhotos() {
+        guard let photoManager else {
+            savingState = .failure("PhotoManager not exist")
+            return
+        }
+        
+        savingState = .saving
+        
+        Task {
+            do {
+                try await photoManager.savePhotos(photos: selectedPhotosInGroup)
+                savingState = .success
+            } catch {
+                savingState = .failure(error.localizedDescription)
+            }
+        }
+    }
+    
+    func toggleGroupedPhotoView(for photo: Photo) {
+        if let index = selectedPhotosInGroup.firstIndex(where: { $0.url == photo.url}) {
+            selectedPhotosInGroup.remove(at: index)
+        } else {
+            selectedPhotosInGroup.append(photo)
         }
     }
 }

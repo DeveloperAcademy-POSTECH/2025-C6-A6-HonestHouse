@@ -30,6 +30,7 @@ struct GroupedPhotosView: View {
                 ProgressView()
             case .success(let groupedPhotos):
                 groupedPhotosGridView(groupedPhotos: groupedPhotos)
+                selectionCompleteButtonView()
             case .failure(_):
                 Color.clear
             }
@@ -60,7 +61,7 @@ struct GroupedPhotosView: View {
                     GroupedPhotosGridCellView(
                         group: group,
                         selectedPhotosInGroup: vm.selectedPhotosInGroup,
-                        onTapGroupedPhoto: toggleGroupedPhotoView
+                        onTapGroupedPhoto: vm.toggleGroupedPhotoView
                     )
                 }
             }
@@ -69,11 +70,25 @@ struct GroupedPhotosView: View {
         }
     }
     
-    private func toggleGroupedPhotoView(for photo: Photo) {
-        if let index = vm.selectedPhotosInGroup.firstIndex(where: { $0.url == photo.url}) {
-            vm.selectedPhotosInGroup.remove(at: index)
-        } else {
-            vm.selectedPhotosInGroup.append(photo)
+    private func selectionCompleteButtonView() -> some View {
+        VStack {
+            Spacer()
+            if !vm.selectedPhotosInGroup.isEmpty {
+                Button {
+                    vm.saveSelectedPhotos()
+                } label: {
+                    Text("완료")
+                        .font(.title3)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 20)
+                        .background(Color.gray)
+                        .foregroundStyle(Color.black)
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                }
+                .padding(.horizontal, 16)
+                .padding(.bottom, 12)
+            }
         }
     }
 }
+
