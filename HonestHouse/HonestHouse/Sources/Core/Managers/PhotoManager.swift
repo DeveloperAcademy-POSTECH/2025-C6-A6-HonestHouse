@@ -8,7 +8,7 @@
 import Foundation
 import Photos
 
-final class PhotoKitManager: PhotoManagerType {
+final class PhotoManager: PhotoManagerType {
     private let imageLoader: ImageLoader
     private let albumName = "Bracket" // TODO: 추후 분리 예정
     
