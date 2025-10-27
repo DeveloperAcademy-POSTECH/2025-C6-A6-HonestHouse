@@ -51,7 +51,7 @@ struct PhotoSelectionView: View {
             }
             .onChange(of: vm.state) { _, newState in
                 if case .failure(let error) = newState {
-                    toastMessage = "\(error.errorDescription)"
+                    toastMessage = error.localizedDescription
                     showToast = true
                 } else {
                     showToast = false
