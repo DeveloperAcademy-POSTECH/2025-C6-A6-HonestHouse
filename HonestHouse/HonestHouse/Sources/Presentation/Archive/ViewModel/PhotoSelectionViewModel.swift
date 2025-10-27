@@ -173,7 +173,7 @@ extension PhotoSelectionViewModel: ErrorHandleable {
     }
     
     func toggleGridCell(for photo: Photo) {
-        if let index = selectedPhotos.firstIndex(where: { $0.id == photo.id }) {
+        if let index = selectedPhotos.firstIndex(where: { $0.url == photo.url }) {
             selectedPhotos.remove(at: index)
         } else {
             selectedPhotos.append(photo)

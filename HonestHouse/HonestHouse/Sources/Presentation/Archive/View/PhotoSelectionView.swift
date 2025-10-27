@@ -63,12 +63,15 @@ struct PhotoSelectionView: View {
     private func photoSelectionGridView() -> some View {
         ScrollView {
             LazyVGrid(columns: columns, spacing: 2) {
-                ForEach(vm.entireContentUrls.map { Photo(url: $0) }) { photo in
+                ForEach(vm.entireContentUrls.indices, id: \.self) { index in
+                    let url = vm.entireContentUrls[index]
+                    let photo = Photo(url: url)
                     SelectionGridCellView(
                         item: photo,
-                        isSelected: vm.selectedPhotos.contains(where: { $0.id == photo.id }),
+                        isSelected: vm.selectedPhotos.contains(where: { $0.url == url }),
                         onTapSelectionGridCell: { vm.toggleGridCell(for: photo) }
                     )
+                    .id(url)  // URL을 id로 사용
                 }
                 
                 if vm.hasMore {
