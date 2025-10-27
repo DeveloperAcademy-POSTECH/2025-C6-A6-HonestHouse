@@ -71,4 +71,12 @@ class GroupedPhotosViewModel {
             }
         }
     }
+    
+    func toggleGroupedPhotoView(for photo: Photo) {
+        if let index = selectedPhotosInGroup.firstIndex(where: { $0.url == photo.url}) {
+            selectedPhotosInGroup.remove(at: index)
+        } else {
+            selectedPhotosInGroup.append(photo)
+        }
+    }
 }

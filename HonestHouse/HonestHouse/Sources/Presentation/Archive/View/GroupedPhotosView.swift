@@ -61,20 +61,12 @@ struct GroupedPhotosView: View {
                     GroupedPhotosGridCellView(
                         group: group,
                         selectedPhotosInGroup: vm.selectedPhotosInGroup,
-                        onTapGroupedPhoto: toggleGroupedPhotoView
+                        onTapGroupedPhoto: vm.toggleGroupedPhotoView
                     )
                 }
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 32)
-        }
-    }
-    
-    private func toggleGroupedPhotoView(for photo: Photo) {
-        if let index = vm.selectedPhotosInGroup.firstIndex(where: { $0.url == photo.url}) {
-            vm.selectedPhotosInGroup.remove(at: index)
-        } else {
-            vm.selectedPhotosInGroup.append(photo)
         }
     }
     
