@@ -38,8 +38,11 @@ extension PhotoSelectionViewModel: ArchiveErrorHandleable {
     }
     
     func handleError(_ error: Error) {
-        let mapped = SelectionError.from(error)
-        state = .failure(mapped)
+        if let selectionError = error as? SelectionError {
+            state = .failure(selectionError)
+        } else {
+            state = .failure(SelectionError.from(error))
+        }
     }
     
     /// storageListResponse를 받아와서 storageList로 변환
