@@ -31,7 +31,7 @@ final class PhotoSelectionViewModel {
     
 }
 
-extension PhotoSelectionViewModel: ErrorHandleable {
+extension PhotoSelectionViewModel: ArchiveErrorHandleable {
     func configure(container: DIContainer) {
         guard self.imageOperationsService == nil else { return }
         self.imageOperationsService = container.services.imageOperationsService

@@ -7,7 +7,7 @@
 
 import Foundation
 
-protocol ErrorHandleable: AnyObject {
+protocol ArchiveErrorHandleable: AnyObject {
     associatedtype Success: Equatable
     associatedtype Failure: Error & Equatable
 
@@ -15,7 +15,7 @@ protocol ErrorHandleable: AnyObject {
     func handleError(_ error: Error)
 }
 
-extension ErrorHandleable {
+extension ArchiveErrorHandleable {
     func handleError(_ error: Error) {
         // 기본 동작: Failure 타입의 `init(error:)`를 강제 구현하지 않아도 되게끔
         if let mappedError = error as? Failure {
