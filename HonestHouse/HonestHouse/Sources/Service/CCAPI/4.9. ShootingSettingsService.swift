@@ -17,7 +17,6 @@ protocol ShootingSettingsServiceType {
 final class ShootingSettingsService: BaseService, ShootingSettingsServiceType {
     
     func getShootingMode(with version: VersionType) async throws -> ShootingSettings.ShootingModeResponse {
-        
         let response = try await requestWithRetry(ShootingSettingsTarget.getShootingMode, decoding: ShootingSettings.ShootingModeResponse.self)
         
         return response
