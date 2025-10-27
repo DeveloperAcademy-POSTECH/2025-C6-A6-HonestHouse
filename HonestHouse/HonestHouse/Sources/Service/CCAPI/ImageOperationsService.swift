@@ -21,23 +21,24 @@ protocol ImageOperationsServiceType {
 }
 
 final class ImageOperationsService: BaseService, ImageOperationsServiceType {
+    
     // MARK: - GET list of storage URLs
     func getStorageList() async throws -> ImageOperations.StorageListResponse {
-        let response = try await requestWithRetry(ImageOperationsTarget.getStorageList, decoding: ImageOperations.StorageListResponse.self)
+        let response = try await request(ImageOperationsTarget.getStorageList, decoding: ImageOperations.StorageListResponse.self)
         
         return response
     }
 
     // MARK: - GET list of storage directorie URLs
     func getDirectoryList(storage: String) async throws -> ImageOperations.DirectoryListResponse {
-        let response = try await requestWithRetry(ImageOperationsTarget.getDirectoryList(storage), decoding: ImageOperations.DirectoryListResponse.self)
+        let response = try await request(ImageOperationsTarget.getDirectoryList(storage), decoding: ImageOperations.DirectoryListResponse.self)
         
         return response
     }
     
     // MARK: - GET list of Content URLs
     func getContentList(storage: String, directory: String, type: String, kind: String, page: Int) async throws -> ImageOperations.ContentListResponse {
-        let response = try await requestWithRetry(ImageOperationsTarget.getContentList(storage, directory, type, kind, page), decoding: ImageOperations.ContentListResponse.self)
+        let response = try await request(ImageOperationsTarget.getContentList(storage, directory, type, kind, page), decoding: ImageOperations.ContentListResponse.self)
         
         return response
     }

@@ -23,13 +23,13 @@ final class ShootingSettingsService: BaseService, ShootingSettingsServiceType {
     }
     
     func getPictureStyle(with version: VersionType) async throws -> ShootingSettings.PictureStyleResponse {
-        let response = try await requestWithRetry(ShootingSettingsTarget.getPictureStyle, decoding: ShootingSettings.PictureStyleResponse.self)
+        let response = try await request(ShootingSettingsTarget.getPictureStyle, decoding: ShootingSettings.PictureStyleResponse.self)
         
         return response
     }
     
     func putPictureStyle(with version: VersionType, request: StringValueRequest) async throws -> ShootingSettings.PictureStyleResponse {
-        let response = try await requestWithRetry(ShootingSettingsTarget.putPictureStyle(request), decoding: ShootingSettings.PictureStyleResponse.self)
+        let response = try await self.request(ShootingSettingsTarget.putPictureStyle(request), decoding: ShootingSettings.PictureStyleResponse.self)
         
         return response
     }
