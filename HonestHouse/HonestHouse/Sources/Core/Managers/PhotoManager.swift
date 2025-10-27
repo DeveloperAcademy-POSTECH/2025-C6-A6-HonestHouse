@@ -9,13 +9,18 @@ import Foundation
 import Photos
 
 final class PhotoKitManager: PhotoManagerType {
-    private let imageLoader = ImageLoader()
+    private let imageLoader: ImageLoader
+    private let albumName = "Bracket" // TODO: 추후 분리 예정
     
-    func savePhotos(photos: [Photo], albumName: String) async throws {
+    init(imageLoader: ImageLoader = .shared) {
+        self.imageLoader = imageLoader
+    }
+    
+    func savePhotos(photos: [Photo]) async throws {
         try await requestAuthorization()
         let album = try await getOrCreateAlbum(albumName: albumName)
         for photo in photos {
-            let imageData = try await fetchImageData(from: photo)
+            let imageData = try await imageLoader.fetchImageData(from: photo.url)
             try await saveImageData(imageData, to: album)
         }
     }
@@ -63,16 +68,6 @@ final class PhotoKitManager: PhotoManagerType {
         } catch {
             throw PhotoError.albumCreationFailed
         }
-    }
-    
-    private func fetchImageData(from photo: Photo) async throws -> Data {
-        let image = try await imageLoader.fetchUIImage(from: photo.url)
-        
-        guard let imageData = image.jpegData(compressionQuality: 1.0) else {
-            throw PhotoError.imageDataMissing
-        }
-        
-        return imageData
     }
     
     private func saveImageData(_ data: Data, to album: PHAssetCollection) async throws {
