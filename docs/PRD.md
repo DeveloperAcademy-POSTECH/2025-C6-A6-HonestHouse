@@ -53,7 +53,10 @@
       - Core/
         - Managers/
           - Error/
+            - PhotoError.swift
             - VisionError.swift
+          - PhotoManager.swift
+          - PhotoManagerType.swift
           - VisionManager.swift
           - VisionManagerType.swift
         - Model/
@@ -85,10 +88,6 @@
           - View/
           - ViewModel/
         - Common/
-        - RemoteController/
-          - Component/
-          - View/
-          - ViewModel/
         - Trishoot/
           - Component/
           - View/
@@ -113,30 +112,36 @@
 
 #### 7.1. Tri-shot 연속 촬영 (Remote Shooting)
 
--   **설명:** 사용자가 정의한 여러 촬영 설정(프리셋)을 한 번의 셔터로 연속 촬영하게 하는 핵심 기능입니다.
+-   **설명:** `MainView`의 Segmented Control을 통해 접근하는 원격 촬영 기능입니다. 사용자가 정의한 여러 촬영 설정(프리셋)을 한 번의 셔터로 연속 촬영하게 합니다.
 -   **주요 기술:**
     -   **네트워킹 (`URLSession`, `Digest Authentication`):** Canon 카메라와의 실시간 통신(CCAPI)을 담당합니다.
-    -   **UI (`SwiftUI`):** 촬영 프리셋 설정 및 원격 촬영을 위한 사용자 인터페이스를 제공합니다.
+    -   **UI (`SwiftUI`):** `MainView` 내에서 촬영 프리셋 설정 및 원격 촬영을 위한 사용자 인터페이스를 제공합니다.
     -   **상태 관리 (`MVVM`):** 사용자의 인터랙션과 촬영 프로세스의 상태를 관리합니다.
 -   **핵심 파일:**
-    -   `Presentation/Trishoot/TrishootView.swift`: 사용자가 프리셋을 선택하고 촬영을 시작하는 메인 화면.
-    -   `Presentation/Trishoot/TrishootViewModel.swift`: View의 상태를 관리하고, Service를 통해 카메라 제어 명령을 전달.
+    -   `Presentation/Main/View/MainView.swift`: Segmented Control을 통해 "Tri-shot" 뷰와 "프리셋 설정" 뷰를 전환하는 컨테이너 뷰.
+    -   `Presentation/Trishoot/View/TrishootView.swift`: `MainView`에 포함되어 실제 Tri-shot 프리셋 선택 및 촬영을 담당하는 화면.
+    -   `Presentation/Trishoot/View/PresetSetupView.swift`: `MainView`에 포함되어 Tri-shot 프리셋을 생성 및 관리하는 화면.
+    -   `Presentation/Trishoot/ViewModel/TrishootViewModel.swift`: `TrishootView`의 상태를 관리하고, Service를 통해 카메라 제어 명령을 전달.
     -   `Service/CCAPI/ShootingSettingsService.swift`: 실제 카메라 촬영 및 설정을 제어하는 비즈니스 로직.
     -   `Core/Network/CCAPI/`: 카메라 제어를 위한 API 엔드포인트 및 요청/응답 정의.
 -   **동작 흐름:**
-    1.  **View:** 사용자가 `TrishootView`에서 촬영 버튼을 누릅니다.
-    2.  **ViewModel:** `TrishootViewModel`이 정의된 프리셋 목록을 확인합니다.
-    3.  **Service:** `ShootingSettingsService`를 통해 각 프리셋에 맞는 촬영 설정 변경 및 촬영 명령을 `CCAPI`로 순차적으로 전송합니다.
+    1.  **View:** 사용자가 `MainView`에서 "Tri-shot" 또는 "프리셋 설정" 세그먼트를 선택합니다.
+    2.  **View:** 선택에 따라 `TrishootView` 또는 `PresetSetupView`가 화면에 표시됩니다.
+    3.  **ViewModel:** 각 뷰에 연결된 ViewModel이 사용자의 입력을 처리합니다.
+    4.  **Service:** `TrishootViewModel`을 통해 `ShootingSettingsService`에 촬영 명령을 전달합니다.
 
 #### 7.2. 지능형 사진 그룹화 (Intelligent Grouping & Archiving)
 
--   **설명:** 연속 촬영으로 생성된 다수의 사진을 시공간적, 시각적 유사도를 기준으로 자동 그룹화하여 사용자의 사진 선별 작업을 돕는 기능입니다.
+-   **설명:** 연속 촬영으로 생성된 다수의 사진을 시공간적, 시각적 유사도를 기준으로 자동 그룹화하여 사용자의 사진 선별 작업을 돕고, 선택된 베스트 컷을 기기의 사진 앨범에 저장하는 기능입니다.
 -   **주요 기술:**
     -   **이미지 분석 (`Vision Framework`):** 사진 간의 시각적 유사도를 계산하는 데 사용됩니다.
+    -   **사진 라이브러리 (`Photos Framework`):** 사용자가 선택한 베스트 컷을 기기의 사진 앨범에 저장하는 기능을 담당합니다.
     -   **데이터 모델링 (`Swift Structs`):** 분석된 사진과 그룹의 정보를 구조화합니다.
     -   **UI (`SwiftUI`):** 그룹화된 사진을 효과적으로 보여주고 사용자가 선택할 수 있는 인터페이스를 제공합니다.
 -   **핵심 파일:**
     -   `Core/Managers/VisionManager.swift`: Apple의 Vision 프레임워크를 사용하여 이미지의 특징(Feature Print)을 추출하고 비교하는 핵심 로직.
+    -   `Core/Managers/PhotoManager.swift`: `Photos` 프레임워크와 상호작용하여 사진을 앨범에 저장하는 로직.
+    -   `Core/Managers/Error/PhotoError.swift`: 사진 저장 과정에서 발생하는 오류를 정의.
     -   `Core/Model/SimilarPhotoGroup.swift`: 유사한 사진들의 그룹을 나타내는 데이터 모델.
     -   `Presentation/Archive/GroupedPhotosView.swift`: 유사도에 따라 그룹화된 사진 앨범을 보여주는 뷰.
     -   `Presentation/Archive/PhotoSelectionView.swift`: 특정 그룹 내에서 베스트 컷을 확대하고 비교/선택하는 뷰.
@@ -145,6 +150,7 @@
     2.  **Analysis:** 각 사진의 생성 시간, GPS 정보(시공간적)와 Vision Feature Print(시각적)를 추출하여 유사도를 계산합니다.
     3.  **Model:** 유사도가 높은 사진들을 `SimilarPhotoGroup` 객체로 묶습니다.
     4.  **ViewModel & View:** `GroupedPhotosViewModel`이 이 그룹 데이터를 받아 `GroupedPhotosView`에 시각적으로 표시합니다.
+    5.  **Save:** 사용자가 `PhotoSelectionView`에서 베스트 컷을 선택한 후 저장하면, `GroupedPhotosViewModel`이 `PhotoManager`를 통해 선택된 사진들을 기기의 "HonestHouse" 앨범에 저장합니다.
 
 ---
 
@@ -175,8 +181,11 @@
     - **사용자 (구현자)**: 사용자는 AI의 제안에 따라 코드를 수정하는 유일한 주체입니다.
     - **검증 루프**: 사용자가 수정 완료를 확인하면, AI는 다음 단계로 진행하기 전에 파일 내용을 다시 읽어 변경사항이 올바르게 적용되었는지 확인해야 합니다.
 - **컨텍스트 요약 워크플로우**:
-    - AI 또는 사용자의 요청에 따라 컨텍스트 요약을 진행합니다.
-    - 요약 내용은 Notion과 로컬 `context-summary.md` 파일에 저장되며, 이후 AI는 이 요약 파일을 기준으로 작업을 진행합니다.
+    - 작업 브랜치에서 특정 기능 개발이나 수정이 완료되면, AI 또는 사용자의 요청에 따라 해당 작업에 대한 컨텍스트 요약을 진행합니다.
+    - 요약 파일은 `docs/context/` 디렉토리 내에 저장됩니다.
+    - 파일 이름은 현재 Git 브랜치 이름을 기반으로 생성하며, 파일명으로 사용할 수 없는 특수문자(`/`, `#` 등)는 하이픈(`-`)으로 치환합니다. (예: `feat/#27/download` -> `feat-27-download.md`)
+    - 생성된 요약 파일은 Pull Request(PR) 설명에 링크하여 코드 리뷰어가 작업 맥락을 쉽게 파악할 수 있도록 돕습니다.
+    - 이후 AI는 특정 작업과 관련된 컨텍스트 파일을 기반으로 작업을 진행합니다.
 
 #### 커뮤니케이션 원칙
 
