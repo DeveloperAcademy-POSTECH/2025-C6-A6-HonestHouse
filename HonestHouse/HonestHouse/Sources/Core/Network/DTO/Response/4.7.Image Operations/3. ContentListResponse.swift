@@ -7,7 +7,7 @@
 
 extension ImageOperations {
     
-    /// 디렉토리 리스트
+    /// 콘텐츠 리스트
     struct ContentListResponse: BaseResponse {
         let url: [String]?
     }

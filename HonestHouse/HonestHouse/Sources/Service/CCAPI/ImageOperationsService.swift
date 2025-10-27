@@ -25,8 +25,6 @@ final class ImageOperationsService: BaseService, ImageOperationsServiceType {
     func getStorageList() async throws -> ImageOperations.StorageListResponse {
         let response = try await requestWithRetry(ImageOperationsTarget.getStorageList, decoding: ImageOperations.StorageListResponse.self)
         
-        print("Storage URLs: \(response.url ?? [])")
-        
         return response
     }
 
@@ -34,16 +32,12 @@ final class ImageOperationsService: BaseService, ImageOperationsServiceType {
     func getDirectoryList(storage: String) async throws -> ImageOperations.DirectoryListResponse {
         let response = try await requestWithRetry(ImageOperationsTarget.getDirectoryList(storage), decoding: ImageOperations.DirectoryListResponse.self)
         
-        print("Directory URLs: \(response.url ?? [])")
-        
         return response
     }
     
     // MARK: - GET list of Content URLs
     func getContentList(storage: String, directory: String, type: String, kind: String, page: Int) async throws -> ImageOperations.ContentListResponse {
         let response = try await requestWithRetry(ImageOperationsTarget.getContentList(storage, directory, type, kind, page), decoding: ImageOperations.ContentListResponse.self)
-        
-        print("Content URLs: \(response.url ?? [])")
         
         return response
     }
