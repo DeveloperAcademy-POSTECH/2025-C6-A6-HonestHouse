@@ -18,17 +18,44 @@ struct PhotoSelectionView: View {
     @State var vm: PhotoSelectionViewModel = .init()
     @EnvironmentObject var container: DIContainer
     
+    @State private var showToast: Bool = false
+    @State private var toastMessage: String = ""
+    
     var body: some View {
         NavigationStack {
             ZStack {
-                photoSelectionGridView()
-                selectionCompleteButtonView()
+                switch vm.state {
+                case .idle, .loading:
+                    ProgressView("사진을 불러오는 중...")
+                    
+                case .success:
+                    ZStack {
+                        photoSelectionGridView()
+                        selectionCompleteButtonView()
+                    }
+                    
+                case .failure(_):
+                    Color.clear
+                }
+                
+                if showToast {
+                    ToastView(message: toastMessage, isShowing: $showToast)
+                        .transition(.move(edge: .bottom))
+                }
             }
             .navigationTitle("카메라 이름")
             .navigationBarTitleDisplayMode(.large)
             .task {
                 vm.configure(container: container)
                 await vm.fetchFirstPageImage()
+            }
+            .onChange(of: vm.state) { _, newState in
+                if case .failure(let error) = newState {
+                    toastMessage = "\(error.errorDescription)"
+                    showToast = true
+                } else {
+                    showToast = false
+                }
             }
         }
     }
@@ -49,7 +76,7 @@ struct PhotoSelectionView: View {
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 12)
                         .task {
-                            await vm.loadCurrentPage()
+                            await vm.loadCurrentPageSafely()
                         }
                 }
             }
