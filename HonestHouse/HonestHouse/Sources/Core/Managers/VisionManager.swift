@@ -9,7 +9,11 @@ import SwiftUI
 import Vision
 
 class VisionManager: VisionManagerType {
-    private let imageLoader = ImageLoader()
+    private let imageLoader: ImageLoader
+    
+    init(imageLoader: ImageLoader = .shared) {
+        self.imageLoader = imageLoader
+    }
     
     public func analyzeImages(
         _ photos: [Photo],
