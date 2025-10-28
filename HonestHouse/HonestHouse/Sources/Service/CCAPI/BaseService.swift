@@ -69,43 +69,5 @@ class BaseService {
         
         return string
     }
-    
-    /// 응답 본문이 있지만 디코딩이 필요없는 PUT 요청용
-    func request<T: Decodable, Target: TargetType>(
-        _ target: Target,
-        decoding: T.Type,
-        expectResponse: Bool
-    ) async throws -> T {
-        let response = try await networkManager.request(target)
-        
-        guard (200...299).contains(response.statusCode) else {
-            throw CCAPIError.unexpectedStatusCode(response.statusCode)
-        }
-        
-        // PUT 요청이지만 응답 본문이 있는 경우
-        do {
-            return try jsonDecoder.decode(T.self, from: response.data)
-        } catch {
-            throw CCAPIError.decodingFailed(error.localizedDescription)
-        }
-    }
 }
 
-// MARK: - Error Types
-
-enum CCAPIError: Error, LocalizedError {
-    case unexpectedStatusCode(Int)
-    case decodingFailed(String)
-    case authenticationFailed(Int)
-    
-    var errorDescription: String? {
-        switch self {
-        case .unexpectedStatusCode(let code):
-            return "Unexpected status code: \(code)"
-        case .decodingFailed(let message):
-            return "Decoding failed: \(message)"
-        case .authenticationFailed(let code):
-            return "Authentication failed with code: \(code)"
-        }
-    }
-}

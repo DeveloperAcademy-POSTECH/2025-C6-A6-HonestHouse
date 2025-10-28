@@ -89,6 +89,7 @@ struct LiveViewArea: View {
     
     // MARK: - Private Methods
     
+    @MainActor
     private func connectCamera() async {
         errorMessage = nil
         
@@ -100,7 +101,7 @@ struct LiveViewArea: View {
             // 2. CanonLiveViewStreamAuth 설정 (라이브뷰용)
             try await viewModel.configureCamera(
                 ipAddress: "192.168.1.2",
-                port: 443,  // 라이브뷰는 8080 포트 사용
+                port: 443, 
                 username: "",
                 password: ""
             )
@@ -113,6 +114,7 @@ struct LiveViewArea: View {
         }
     }
     
+    @MainActor
     private func startLiveView() async {
         guard isConnected else {
             errorMessage = "먼저 카메라를 연결하세요"
@@ -130,6 +132,7 @@ struct LiveViewArea: View {
         }
     }
     
+    @MainActor
     private func stopLiveView() async {
         await viewModel.stopLiveView()
         print("✅ 라이브뷰 중지")

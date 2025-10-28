@@ -32,6 +32,8 @@ class NetworkManager {
         )
     }
     
+    private init() {}
+    
     // MARK: - Initialization
     
     func configure(cameraIP: String,
@@ -74,7 +76,8 @@ class NetworkManager {
     
     /// 초기 인증 (401 응답 받아서 nonce 획득)
     func initializeAuthentication() async throws {
-        try await authManager?.authenticate()
+        guard let authManager else { throw CCAPIError.notConfigured }
+        try await authManager.authenticate()
     }
     
     /// API 요청 (Android WebAPI.executeRequest와 동일한 로직)
@@ -89,26 +92,40 @@ class NetworkManager {
         
         // Android의 while(true) 루프와 동일
         while true {
-            let response = try await requestOnce(target, provider: provider)
-            
-            // 401 처리 (Android HttpCommunication.sendRequest와 동일)
-            if response.statusCode == 401 {
-                authErrorCount += 1
+            do {
+                let response = try await requestOnce(target, provider: provider)
                 
-                // Android: if(authErrorCount < MAX_AUTH_ERROR) continue;
-                if authErrorCount < maxAuthRetries {
-                    print("⚠️ 401 received, retrying... (\(authErrorCount)/\(maxAuthRetries))")
-                    // DigestAuthPlugin.process()가 이미 nonce를 갱신했음
-                    // Android처럼 바로 continue로 재시도
-                    continue
-                } else {
-                    print("❌ Max auth retries exceeded")
-                    throw CCAPIError.authenticationFailed(401)
+                // 401 처리 (Android HttpCommunication.sendRequest와 동일)
+                if response.statusCode == 401 {
+                    authErrorCount += 1
+                    
+                    // Android: if(authErrorCount < MAX_AUTH_ERROR) continue;
+                    if authErrorCount < maxAuthRetries {
+                        print("⚠️ 401 received, retrying... (\(authErrorCount)/\(maxAuthRetries))")
+                        // DigestAuthPlugin.process()가 이미 nonce를 갱신했음
+                        // Android처럼 바로 continue로 재시도
+                        continue
+                    } else {
+                        print("❌ Max auth retries exceeded")
+                        throw CCAPIError.authenticationFailed(401)
+                    }
                 }
+                
+                // 401이 아닌 응답은 그대로 반환
+                return response
+            } catch let error as MoyaError {
+                if case .statusCode(let response) = error, response.statusCode == 401 {
+                    authErrorCount += 1
+                    if authErrorCount < maxAuthRetries {
+                        print("⚠️ 401(MoyaError) received, retrying... (\(authErrorCount)/\(maxAuthRetries))")
+                        continue
+                    } else {
+                        print("❌ Max auth retries exceeded")
+                        throw CCAPIError.authenticationFailed(401)
+                    }
+                }
+                throw error
             }
-            
-            // 401이 아닌 응답은 그대로 반환
-            return response
         }
     }
     

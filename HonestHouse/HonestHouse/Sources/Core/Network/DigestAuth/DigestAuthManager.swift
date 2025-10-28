@@ -17,6 +17,11 @@ class DigestAuthManager {
     private let sslDelegate: SSLPinningDelegate
     private var isAuthenticated = false
     
+    /// 인증 준비 상태
+    var isReady: Bool {
+        return isAuthenticated
+    }
+    
     // MARK: - Initialization
     
     init(baseURL: String,
@@ -123,11 +128,7 @@ class DigestAuthManager {
         
         return header
     }
-    
-    /// 인증 준비 상태
-    var isReady: Bool {
-        return isAuthenticated
-    }
+
     
     /// 인증 리셋
     func reset() {

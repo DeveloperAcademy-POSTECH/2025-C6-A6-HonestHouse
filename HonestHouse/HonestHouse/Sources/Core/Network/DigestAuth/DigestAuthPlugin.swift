@@ -59,7 +59,7 @@ final class DigestAuthPlugin: PluginType {
             body: request.httpBody
         )
         
-        // 재시도를 위해 에러 반환
-        return .failure(MoyaError.statusCode(response))
+        // nonce 갱신한 하고, 응답은 그대로 반환 (재시도는 상위에서 처리)
+        return result
     }
 }

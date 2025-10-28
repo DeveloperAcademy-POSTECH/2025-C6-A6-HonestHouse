@@ -110,9 +110,9 @@ actor ChunkedStreamParser {
             
             // 데이터 크기 추출 (Big Endian)
             let sizeBytes = buffer.subdata(in: 3..<7)
-            currentDataSize = Int(sizeBytes.withUnsafeBytes { bytes in
-                bytes.load(as: UInt32.self).bigEndian
-            })
+            var sz: UInt32 = 0
+            for b in sizeBytes { sz = (sz << 8) | UInt32(b) }
+            currentDataSize = Int(sz)
             
             print("   📋 Frame header parsed: type=0x\(String(format: "%02X", dataType)), size=\(currentDataSize) bytes")
             
