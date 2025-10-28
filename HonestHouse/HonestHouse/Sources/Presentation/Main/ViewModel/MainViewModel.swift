@@ -9,13 +9,7 @@ import SwiftUI
 
 @Observable
 final class MainViewModel {
-    var selectedSegment: MainViewSegmentType = .trishot {
-        didSet {
-            if selectedSegment != oldValue {
-                exitEditMode()
-            }
-        }
-    }
+    private(set) var selectedSegment: MainViewSegmentType = .trishot
     
     var segments: [MainViewSegmentType] = [.trishot, .preset]
     var isEditMode: Bool = false
@@ -25,6 +19,12 @@ final class MainViewModel {
 
     var showEditButton: Bool {
         selectedSegment == .preset
+    }
+    
+    func setSelectedSegment(_ segment: MainViewSegmentType) {
+        guard selectedSegment != segment else { return }
+        selectedSegment = segment
+        exitEditMode()
     }
 
     func toggleEditMode() {

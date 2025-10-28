@@ -123,7 +123,10 @@ struct MainView: View {
     
     
     private func segmentedControlView() -> some View {
-        Picker("", selection: $vm.selectedSegment) {
+        Picker("", selection: Binding(
+            get: { vm.selectedSegment },
+            set: { vm.setSelectedSegment($0) }
+        )) {
             ForEach(vm.segments, id: \.self) {
                 Text($0.displayName)
                     .font(.system(size: 14, weight: .semibold))
