@@ -6,17 +6,28 @@
 //
 
 import SwiftUI
+import SwiftData
 
 @main
 struct HonestHouseApp: App {
-    
-    @State var container = DIContainer(services: Services())
-    
-    var body: some Scene {
-        WindowGroup {
-            LiveViewArea()
+    let modelContainer: ModelContainer
+    @State var container: DIContainer
+
+    init() {
+        do {
+            modelContainer = try ModelContainer(for: Preset.self)
+            let services = Services(modelContext: modelContainer.mainContext)
+            container = DIContainer(services: services)
+        } catch {
+            fatalError("Failed to create ModelContainer: \(error)")
         }
     }
+
+    var body: some Scene {
+        WindowGroup {
+            MainView()
+                .environmentObject(container)
+        }
+        .modelContainer(modelContainer)
+    }
 }
-
-
