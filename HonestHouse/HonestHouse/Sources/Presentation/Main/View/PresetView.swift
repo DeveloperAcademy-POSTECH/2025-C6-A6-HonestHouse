@@ -35,33 +35,15 @@ struct PresetView: View {
 
     var body: some View {
         ZStack(alignment: .bottom) {
-            ScrollView {
-                PresetGridView(
-                    presets: presets,
-                    isEditMode: isEditMode,
-                    selectedPresets: vm.selectedPresets,
-                    onTap: { preset in
-                        onShowDetail(preset)
-                    },
-                    onShoot: { preset in
-                        vm.showShootAlert(for: preset)
-                    },
-                    onToggleSelection: { preset in
-                        vm.toggleSelection(for: preset)
-                    }
-                )
-                .padding(.top, 3)
-                .padding(.horizontal, 2)
-            }
-            .scrollIndicators(.hidden)
+            presetGridScrollView()
 
             Group {
                 if isEditMode {
-                    deleteButton
+                    deleteButton()
                 } else {
                     HStack {
                         Spacer()
-                        addButton
+                        addButton()
                     }
                 }
             }
@@ -83,8 +65,30 @@ struct PresetView: View {
             }
         }
     }
+    
+    private func presetGridScrollView() -> some View {
+        ScrollView {
+            PresetGridView(
+                presets: presets,
+                isEditMode: isEditMode,
+                selectedPresets: vm.selectedPresets,
+                onTap: { preset in
+                    onShowDetail(preset)
+                },
+                onShoot: { preset in
+                    vm.showShootAlert(for: preset)
+                },
+                onToggleSelection: { preset in
+                    vm.toggleSelection(for: preset)
+                }
+            )
+            .padding(.top, 3)
+            .padding(.horizontal, 2)
+        }
+        .scrollIndicators(.hidden)
+    }
 
-    private var addButton: some View {
+    private func addButton() -> some View {
         Button {
             onShowCreate()
         } label: {
@@ -104,7 +108,7 @@ struct PresetView: View {
         }
     }
 
-    private var deleteButton: some View {
+    private func deleteButton() -> some View {
         Button {
             vm.deleteSelectedPresets()
             isEditMode = false
