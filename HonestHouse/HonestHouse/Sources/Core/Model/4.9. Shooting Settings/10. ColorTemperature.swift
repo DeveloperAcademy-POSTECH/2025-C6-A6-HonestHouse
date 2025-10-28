@@ -8,7 +8,7 @@
 import Foundation
 
 struct ColorTemperature {
-    let value: String?
+    let value: Int?
     let ability: Ability?
 }
 
