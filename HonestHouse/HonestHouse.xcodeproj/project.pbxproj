@@ -19,7 +19,7 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		21811D3A2EAF1086001D864A /* Exceptions for "HonestHouse" folder in "HonestHouse" target */ = {
+		6CFE30BB2EAF548000CD1DEC /* Exceptions for "HonestHouse" folder in "HonestHouse" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
@@ -32,7 +32,7 @@
 		21C47E302E9AA5FC00FB6029 /* HonestHouse */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				21811D3A2EAF1086001D864A /* Exceptions for "HonestHouse" folder in "HonestHouse" target */,
+				6CFE30BB2EAF548000CD1DEC /* Exceptions for "HonestHouse" folder in "HonestHouse" target */,
 			);
 			path = HonestHouse;
 			sourceTree = "<group>";

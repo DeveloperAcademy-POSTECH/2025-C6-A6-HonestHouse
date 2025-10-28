@@ -9,53 +9,148 @@ import Foundation
 import Moya
 import Alamofire
 
-/// Moya Provider와 Digest 인증을 통합 관리하는 싱글톤
+/// 네트워크 통신 관리
 class NetworkManager {
+    
     static let shared = NetworkManager()
     
-    private let username = "user"
-    private let password = "0000"
+    private var authManager: DigestAuthManager?
+    private var authPlugin: DigestAuthPlugin?
+    private var session: Session?
+    private let maxAuthRetries = 3
     
-    let digestAuthPlugin: DigestAuthPlugin
-    private let session: Session
-    
-    /// CCAPI Provider
-    lazy var ccapiProvider: MoyaProvider<MultiTarget> = {
+    /// Moya Provider
+    private var provider: MoyaProvider<MultiTarget>? {
+        guard let session = session,
+              let authPlugin = authPlugin else {
+            return nil
+        }
+        
         return MoyaProvider<MultiTarget>(
             session: session,
-            plugins: [
-                digestAuthPlugin,
-                NetworkLoggerPlugin(configuration: .init(logOptions: .verbose))
-            ]
+            plugins: [authPlugin]
         )
-    }()
+    }
     
-    private init() {
-        // Digest Auth Plugin 생성
-        digestAuthPlugin = DigestAuthPlugin(username: username, password: password)
+    private init() {}
+    
+    // MARK: - Initialization
+    
+    func configure(cameraIP: String,
+                   port: Int,
+                   username: String = "",
+                   password: String = "") {
         
-        // SSL 인증서 처리를 위한 ServerTrustManager 설정
-        let serverTrustManager = ServerTrustManager(evaluators: [
-            "192.168.1.2": DisabledTrustEvaluator()  // 자체 서명 인증서 허용
-        ])
+        // SSL 델리게이트 생성
+        let sslDelegate = SSLPinningDelegate()
+        sslDelegate.addTrustedHost(cameraIP)
         
-        // Alamofire Session 설정
-        let configuration = URLSessionConfiguration.default
-        configuration.timeoutIntervalForRequest = 30
-        configuration.timeoutIntervalForResource = 60
+        // baseURL 생성
+        let baseURL = "https://\(cameraIP):\(port)/ccapi/ver110/shooting/settings/scroll"
         
-        session = Session(
-            configuration: configuration,
+        // DigestAuthManager 생성
+        self.authManager = DigestAuthManager(
+            baseURL: baseURL,
+            username: username,
+            password: password,
+            sslDelegate: sslDelegate
+        )
+        
+        // DigestAuthPlugin 생성
+        if let authManager = authManager {
+            self.authPlugin = DigestAuthPlugin(authManager: authManager)
+        }
+        
+        // Alamofire Session 생성
+        let serverTrustManager = ServerTrustManager(
+            evaluators: [cameraIP: DisabledTrustEvaluator()]
+        )
+        
+        self.session = Session(
+            configuration: .default,
             serverTrustManager: serverTrustManager
         )
-        
-        print("NetworkManager initialized")
-        print("  Username: \(username)")
     }
     
-    /// 인증 상태 리셋
-    func resetAuthentication() {
-        digestAuthPlugin.resetAuthentication()
-        print("NetworkManager authentication reset")
+    // MARK: - Public Methods
+    
+    /// 초기 인증 (401 응답 받아서 nonce 획득)
+    func initializeAuthentication() async throws {
+        guard let authManager else { throw CCAPIError.notConfigured }
+        try await authManager.authenticate()
     }
+    
+    /// API 요청 (Android WebAPI.executeRequest와 동일한 로직)
+    /// Android의 while(!isInterrupted) 루프와 동일하게 401 재시도 처리
+    func request<T: TargetType>(_ target: T) async throws -> Response {
+        
+        guard let provider = provider else {
+            throw CCAPIError.notConfigured
+        }
+        
+        var authErrorCount = 0
+        
+        // Android의 while(true) 루프와 동일
+        while true {
+            do {
+                let response = try await requestOnce(target, provider: provider)
+                
+                // 401 처리 (Android HttpCommunication.sendRequest와 동일)
+                if response.statusCode == 401 {
+                    authErrorCount += 1
+                    
+                    // Android: if(authErrorCount < MAX_AUTH_ERROR) continue;
+                    if authErrorCount < maxAuthRetries {
+                        print("⚠️ 401 received, retrying... (\(authErrorCount)/\(maxAuthRetries))")
+                        // DigestAuthPlugin.process()가 이미 nonce를 갱신했음
+                        // Android처럼 바로 continue로 재시도
+                        continue
+                    } else {
+                        print("❌ Max auth retries exceeded")
+                        throw CCAPIError.authenticationFailed(401)
+                    }
+                }
+                
+                // 401이 아닌 응답은 그대로 반환
+                return response
+            } catch let error as MoyaError {
+                if case .statusCode(let response) = error, response.statusCode == 401 {
+                    authErrorCount += 1
+                    if authErrorCount < maxAuthRetries {
+                        print("⚠️ 401(MoyaError) received, retrying... (\(authErrorCount)/\(maxAuthRetries))")
+                        continue
+                    } else {
+                        print("❌ Max auth retries exceeded")
+                        throw CCAPIError.authenticationFailed(401)
+                    }
+                }
+                throw error
+            }
+        }
+    }
+    
+    /// 인증 리셋
+    func resetAuthentication() {
+        authManager?.reset()
+    }
+    
+    // MARK: - Private Methods
+    
+    private func requestOnce<T: TargetType>(_ target: T, provider: MoyaProvider<MultiTarget>) async throws -> Response {
+        return try await withCheckedThrowingContinuation { continuation in
+            provider.request(MultiTarget(target)) { result in
+                switch result {
+                case .success(let response):
+                    continuation.resume(returning: response)
+                case .failure(let error):
+                    continuation.resume(throwing: error)
+                }
+            }
+        }
+    }
+}
+
+
+extension CCAPIError {
+    static let notConfigured = CCAPIError.authenticationFailed(-1)
 }

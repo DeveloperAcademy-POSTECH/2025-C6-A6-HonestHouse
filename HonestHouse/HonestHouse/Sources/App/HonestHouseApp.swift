@@ -14,8 +14,7 @@ struct HonestHouseApp: App {
     
     var body: some Scene {
         WindowGroup {
-            PhotoSelectionView()
-                .environmentObject(container)
+            LiveViewArea()
         }
     }
 }
