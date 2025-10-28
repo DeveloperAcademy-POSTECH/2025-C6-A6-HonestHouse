@@ -18,6 +18,9 @@ enum CCAPIError: Error {
     case notAuthenticated
     case maxRetriesExceeded
     case decodingFailed(String)
+    case deviceUnavailable(String)
+    case urlNotFound
+    case badRequest(String)
     
     var localizedDescription: String {
         switch self {
@@ -39,6 +42,12 @@ enum CCAPIError: Error {
             return "Maximum authentication retries exceeded"
         case .decodingFailed(let message):
             return "JSON decoding failed: \(message)"
+        case .deviceUnavailable(let message):
+            return "Device unavailable: \(message)"
+        case .urlNotFound:
+            return "URL not found"
+        case .badRequest(let message):
+            return "Bad request: \(message)"
         }
     }
 }

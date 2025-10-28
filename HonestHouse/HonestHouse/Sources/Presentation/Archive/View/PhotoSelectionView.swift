@@ -16,49 +16,72 @@ struct PhotoSelectionView: View {
     }
     
     @State var vm: PhotoSelectionViewModel = .init()
+    @EnvironmentObject var container: DIContainer
+    
+    @State private var showToast: Bool = false
+    @State private var toastMessage: String = ""
     
     var body: some View {
         NavigationStack {
             ZStack {
-                photoSelectionGridView()
-                selectionCompleteButtonView()
+                switch vm.state {
+                case .idle, .loading:
+                    ProgressView("사진을 불러오는 중...")
+                    
+                case .success:
+                    ZStack {
+                        photoSelectionGridView()
+                        selectionCompleteButtonView()
+                    }
+                    
+                case .failure(_):
+                    Color.clear
+                }
+                
+                if showToast {
+                    ToastView(message: toastMessage, isShowing: $showToast)
+                        .transition(.move(edge: .bottom))
+                }
             }
             .navigationTitle("카메라 이름")
             .navigationBarTitleDisplayMode(.large)
-//            .task {
-//                await vm.fetchFirstPageImage()
-//            }
+            .task {
+                vm.configure(container: container)
+                await vm.fetchFirstPageImage()
+            }
+            .onChange(of: vm.state) { _, newState in
+                if case .failure(let error) = newState {
+                    toastMessage = error.localizedDescription
+                    showToast = true
+                } else {
+                    showToast = false
+                }
+            }
         }
     }
     
     private func photoSelectionGridView() -> some View {
         ScrollView {
             LazyVGrid(columns: columns, spacing: 2) {
-                /// 현재는 MockPhoto로 대체
-//                ForEach(vm.entireContentUrls.map { Photo(url: $0) }) { photo in
-//                    SelectionGridCellView(
-//                        item: photo,
-//                        isSelected: vm.selectedPhotos.contains(where: { $0.id == photo.id }),
-//                        onTapSelectionGridCell: { vm.toggleGridCell(for: photo) }
-//                    )
-//                }
-                
-                ForEach(vm.mockPhotos) { photo in
+                ForEach(vm.entireContentUrls.indices, id: \.self) { index in
+                    let url = vm.entireContentUrls[index]
+                    let photo = Photo(url: url)
                     SelectionGridCellView(
                         item: photo,
-                        isSelected: vm.selectedPhotos.contains(where: { $0.id == photo.id }),
+                        isSelected: vm.selectedPhotos.contains(where: { $0.url == url }),
                         onTapSelectionGridCell: { vm.toggleGridCell(for: photo) }
                     )
+                    .id(url)  // URL을 id로 사용
                 }
-                    
-//                if vm.hasMore {
-//                    ProgressView()
-//                        .frame(maxWidth: .infinity)
-//                        .padding(.vertical, 12)
-//                        .task {
-//                            await vm.loadCurrentPage()
-//                        }
-//                }
+                
+                if vm.hasMore {
+                    ProgressView()
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 12)
+                        .task {
+                            await vm.loadCurrentPageSafely()
+                        }
+                }
             }
             .padding(.horizontal, 2)
         }
