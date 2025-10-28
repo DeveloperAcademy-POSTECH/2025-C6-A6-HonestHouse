@@ -18,7 +18,7 @@ struct PresetEditorTemporaryView: View {
 
     @State private var name: String
     @State private var selectedMode: String
-    @State private var pictureStyle: String
+    @State private var selectedPictureStyle: PictureStyleType
     @State private var aperture: String
     @State private var shutterSpeed: String
     @State private var iso: String
@@ -29,6 +29,7 @@ struct PresetEditorTemporaryView: View {
     @State private var showingDeleteAlert = false
 
     private let shootingModes = ["Av", "Tv", "P"]
+    private let pictureStyles: [PictureStyleType] = [.auto, .standard, .portrait, .landscape, .finedetail, .neutral, .faithful, .monochrome]
 
     init(
         preset: Preset? = nil,
@@ -40,7 +41,7 @@ struct PresetEditorTemporaryView: View {
         self.onDelete = onDelete
         _name = State(initialValue: preset?.name ?? "")
         _selectedMode = State(initialValue: preset?.shootingMode ?? "Av")
-        _pictureStyle = State(initialValue: preset?.pictureStyle ?? "")
+        _selectedPictureStyle = State(initialValue: preset?.getPictureStyle() ?? .auto)
         _aperture = State(initialValue: preset?.aperture ?? "")
         _shutterSpeed = State(initialValue: preset?.shutterSpeed ?? "")
         _iso = State(initialValue: preset?.iso ?? "")
@@ -53,7 +54,7 @@ struct PresetEditorTemporaryView: View {
     private func resetToInitialValues() {
         name = preset?.name ?? ""
         selectedMode = preset?.shootingMode ?? "Av"
-        pictureStyle = preset?.pictureStyle ?? ""
+        selectedPictureStyle = preset?.getPictureStyle() ?? .auto
         aperture = preset?.aperture ?? ""
         shutterSpeed = preset?.shutterSpeed ?? ""
         iso = preset?.iso ?? ""
@@ -78,7 +79,11 @@ struct PresetEditorTemporaryView: View {
                 }
 
                 Section("색상 설정") {
-                    TextField("픽쳐스타일 (예: Standard)", text: $pictureStyle)
+                    Picker("픽쳐스타일", selection: $selectedPictureStyle) {
+                        ForEach(pictureStyles, id: \.self) { style in
+                            Text(style.displayValue).tag(style)
+                        }
+                    }
                     TextField("색온도 (예: 5200)", text: $colorTemperature)
                         .keyboardType(.numberPad)
                 }
