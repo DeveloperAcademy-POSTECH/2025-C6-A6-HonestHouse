@@ -12,12 +12,11 @@ struct SelectionGridCellView<Item: SelectableItem>: View {
     let item: Item
     let isSelected: Bool
     let onTapSelectionGridCell: () -> Void
-    
+
     var body: some View {
         ZStack(alignment: .bottomTrailing) {
             NavigationLink(destination: PhotoSelectionDetailView(item: item)) {
-                KFImage(URL(string: item.thumbnailURL))
-                    .resizable()
+                CachedThumbnailImage(url: item.thumbnailURL)
                     .aspectRatio(1, contentMode: .fit)
                     .clipped()
                     .overlay(isSelected ? Color.black.opacity(0.3) : Color.clear)

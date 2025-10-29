@@ -10,9 +10,7 @@ import Kingfisher
 
 struct GroupedPhotosGridCellView: View {
     let group: SimilarPhotoGroup
-//    let selectedPhotosInGroup: [Photo]
-//    let onTapGroupedPhoto: (Photo) -> Void
-    
+
     var body: some View {
         NavigationLink(
             destination: GroupedPhotosDetailView(
@@ -22,23 +20,27 @@ struct GroupedPhotosGridCellView: View {
             )
         ) {
             if let firstPhoto = group.photos.first {
-                KFImage(URL(string: firstPhoto.url))
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-                    .frame(width: 160, height: 120)
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
-                    .overlay(
-                        ZStack(alignment: .topTrailing) {
-                            Text("\(group.photos.count)")
-                                .font(.caption)
-                                .fontWeight(.bold)
-                                .foregroundColor(.white)
-                                .padding(6)
-                                .background(Color.black.opacity(0.7))
-                                .clipShape(Circle())
-                                .padding(8)
-                        }
-                    )
+                CachedThumbnailImage(
+                    url: firstPhoto.displayURL,
+                    size: CGSize(width: 400, height: 300),
+                    cornerRadius: 12
+                )
+                .aspectRatio(contentMode: .fill)
+                .frame(width: 160, height: 120)
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+                // 그룹 내 사진 개수 표시
+                .overlay(
+                    ZStack(alignment: .topTrailing) {
+                        Text("\(group.photos.count)")
+                            .font(.caption)
+                            .fontWeight(.bold)
+                            .foregroundColor(.white)
+                            .padding(6)
+                            .background(Color.black.opacity(0.7))
+                            .clipShape(Circle())
+                            .padding(8)
+                    }
+                )
             }
         }
     }
