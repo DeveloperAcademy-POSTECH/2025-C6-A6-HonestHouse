@@ -87,3 +87,9 @@ final class Preset {
         self.updatedAt = updatedAt
     }
 }
+
+extension Preset {
+    static var stub1: Preset {
+        .init(name: "", shootingMode: "")
+    }
+}
