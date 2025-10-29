@@ -18,11 +18,11 @@ final class MainViewModel {
         case goToPhotoSelection
     }
     
-    private(set) var selectedSegment: MainViewSegmentType = .trishot
+    var selectedSegment: MainViewSegmentType = .trishot
     private var container: DIContainer
     
     var segments: [MainViewSegmentType] = [.trishot, .preset]
-    var isEditMode: Bool = false
+    var isPresetEditMode: Bool = false
     var selectedPreset: Preset?
 
     var showEditButton: Bool {
@@ -59,11 +59,11 @@ final class MainViewModel {
     }
 
     func toggleEditMode() {
-        isEditMode.toggle()
+        isPresetEditMode.toggle()
     }
 
     func exitEditMode() {
-        isEditMode = false
+        isPresetEditMode = false
     }
 
 //    func showDetailView(for preset: Preset) {
@@ -73,10 +73,10 @@ final class MainViewModel {
 //    func showEditorView(for preset: Preset? = nil) {
 //        selectedEditorPreset = preset
 //    }
-
-    func showCreateSheet() {
-        showingCreateSheet = true
-    }
+//
+//    func showCreateSheet() {
+//        showingCreateSheet = true
+//    }
 }
 
 extension MainViewModel {

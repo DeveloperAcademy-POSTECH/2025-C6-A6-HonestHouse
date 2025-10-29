@@ -12,26 +12,36 @@ struct MainView: View {
     @EnvironmentObject private var container: DIContainer
     @Environment(\.modelContext) private var modelContext
     @State var vm: MainViewModel
-    
+    @State var isPresetEditMode: Bool = false
+     
     var body: some View {
         NavigationStack(path: $container.navigationRouter.destinations) {
             VStack(spacing: 18) {
                 cameraAndArchiveHeaderView()
                 segmentedControlView()
                 
-                Group {
-                    switch vm.selectedSegment {
-                    case .trishot:
-                        Text("TriShot View")
-                    case .preset:
-                        PresetView(
-                            isEditMode: $vm.isEditMode,
-                            onShowDetail: vm.showDetailView,
-                            onShowCreate: vm.showCreateView
-                        )
+                Picker("", selection: $vm.selectedSegment) {
+                    ForEach(MainViewSegmentType.allCases, id: \.self) { option in
+                        Text(option.displayName).tag(option)
                     }
                 }
-                .padding(.top, 9)
+                
+                switch vm.selectedSegment {
+                case .trishot:
+                    TrishotView()
+                    
+                case .preset:
+                    PresetView(
+                        vm: PresetViewModel(
+                            container: container,
+                            isPresetEditMode: isPresetEditMode,
+                            onEditModeChange: { newValue in
+                                isPresetEditMode = newValue
+                            }
+                        )
+                    )
+                }
+                
             }
             .padding(.horizontal, 16)
         }
@@ -56,7 +66,7 @@ struct MainView: View {
                 Button {
                     vm.toggleEditMode()
                 } label: {
-                    Text(vm.isEditMode ? "완료" : "편집")
+                    Text(vm.isPresetEditMode ? "완료" : "편집")
                         .font(.system(size: 16, weight: .bold))
                 }
                 .padding(.trailing, 12)
@@ -90,6 +100,7 @@ struct MainView: View {
 }
 
 #Preview {
-    MainView(vm: .init(container: .stub))
+    MainView(vm: .init(container: .stub), isPresetEditMode: false)
+        .environmentObject(DIContainer.stub)
 }
 
