@@ -13,7 +13,6 @@ protocol ServiceType {
     var shootingSettingsService: ShootingSettingsServiceType { get set }
     var imageOperationsService: ImageOperationsServiceType { get set }
     var presetService: PresetServiceType { get }
-
 }
 
 class Services: ServiceType {
