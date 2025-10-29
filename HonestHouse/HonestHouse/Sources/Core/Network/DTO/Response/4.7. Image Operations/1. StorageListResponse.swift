@@ -19,4 +19,8 @@ extension ImageOperations.StorageListResponse {
     func toEntity() -> StorageList {
         StorageList(url: url)
     }
+    
+    static var stub1: ImageOperations.StorageListResponse {
+        .init(url: [""])
+    }
 }

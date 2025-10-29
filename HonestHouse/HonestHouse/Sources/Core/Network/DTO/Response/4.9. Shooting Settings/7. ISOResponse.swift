@@ -23,4 +23,11 @@ extension ShootingSettings.ISOResponse {
             ability: ability
         )
     }
+    
+    static var stub1: ShootingSettings.ISOResponse {
+        .init(
+            value: "",
+            ability: [""]
+        )
+    }
 }

@@ -19,4 +19,8 @@ extension ImageOperations.DirectoryListResponse {
     func toEntity() -> DirectoryList {
         DirectoryList(url: url)
     }
+    
+    static var stub1: ImageOperations.DirectoryListResponse {
+        .init(url: [""])
+    }
 }

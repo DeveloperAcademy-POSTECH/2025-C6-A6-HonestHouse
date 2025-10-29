@@ -19,6 +19,9 @@ extension ShootingSettings.ShootingModeResponse {
     func toEntity() -> ShootingMode {
         ShootingMode(value: value)
     }
-}
 
+    static var stub1: ShootingSettings.ShootingModeResponse {
+        .init(value: "")
+    }
+}
 

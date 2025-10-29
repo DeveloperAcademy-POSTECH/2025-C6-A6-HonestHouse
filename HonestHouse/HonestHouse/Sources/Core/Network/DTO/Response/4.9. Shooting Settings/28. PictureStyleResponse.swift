@@ -23,4 +23,11 @@ extension ShootingSettings.PictureStyleResponse {
             ability: ability
         )
     }
+    
+    static var stub1: ShootingSettings.PictureStyleResponse {
+        .init(
+            value: "",
+            ability: [""]
+        )
+    }
 }

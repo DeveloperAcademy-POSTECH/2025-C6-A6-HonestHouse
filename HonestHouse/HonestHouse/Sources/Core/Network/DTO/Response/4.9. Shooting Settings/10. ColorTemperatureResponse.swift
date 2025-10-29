@@ -35,4 +35,15 @@ extension ShootingSettings.ColorTemperatureResponse {
             )
         )
     }
+    
+    static var stub1: ShootingSettings.ColorTemperatureResponse {
+        .init(
+            value: "",
+            ability: .init(
+                min: 0,
+                max: 0,
+                step: 0
+            )
+        )
+    }
 }

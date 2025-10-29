@@ -79,4 +79,25 @@ extension ShootingSettings.WBShiftResponse {
         
         return WBShift(value: entityValue, ability: entityAbility)
     }
+    
+    static var stub1: ShootingSettings.WBShiftResponse {
+        .init(
+            value: .init(
+                blueAmber: 0,
+                magentaGreen: 0
+            ),
+            ability: .init(
+                blueAmberAbility: .init(
+                    min: 0,
+                    max: 0,
+                    step: 0
+                ),
+                magentaGreenAbility: .init(
+                    min: 0,
+                    max: 0,
+                    step: 0
+                )
+            )
+        )
+    }
 }
