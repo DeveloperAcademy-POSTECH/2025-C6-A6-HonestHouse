@@ -10,7 +10,8 @@ import Foundation
 /// 촬영 설정 (Shooting Settings)
 enum ShootingSettingsAPI {
     case getShootingSetting                     /// 모든 촬영 매개변수
-    case shootingMode                           /// 사진촬영 모드  (촬영 다이얼 있는 모델)
+    case shootingMode                           /// 사진촬영 모드 (촬영 다이얼 없는 모델)
+    case shootingModeDial                       /// 사진촬영 모드 (촬영 다이얼 있는 모델)
     case av                                     /// 조리개
     case tv                                     /// 셔터스피드
     case iso                                    /// ISO
@@ -26,6 +27,9 @@ enum ShootingSettingsAPI {
             return "shooting/settings"
             
         case .shootingMode:
+            return "shooting/settings/shootingmode"
+            
+        case .shootingModeDial:
             return "shooting/settings/shootingmodedial"
             
         case .av:
