@@ -15,23 +15,10 @@ struct PresetView: View {
 
     @Binding var isEditMode: Bool
     let onShowDetail: (Preset) -> Void
-    let onShowEditor: (Preset?) -> Void
     let onShowCreate: () -> Void
 
-
-    init(
-        container: DIContainer,
-        isEditMode: Binding<Bool>,
-        onShowDetail: @escaping (Preset) -> Void,
-        onShowEditor: @escaping (Preset?) -> Void,
-        onShowCreate: @escaping () -> Void
-    ) {
-        _isEditMode = isEditMode
-        self.onShowDetail = onShowDetail
-        self.onShowEditor = onShowEditor
-        self.onShowCreate = onShowCreate
-        _vm = State(initialValue: PresetViewModel(container: container))
-    }
+    @State private var showToast: Bool = false
+    @State private var toastMessage: String = ""
 
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -48,17 +35,45 @@ struct PresetView: View {
                 }
             }
             .padding(.bottom, 24)
+
+            if showToast {
+                ToastView(message: toastMessage, isShowing: $showToast)
+                    .transition(.move(edge: .bottom))
+            }
+        }
+        .task {
+            vm.configure(container: container)
+            
+            NetworkManager.shared.configure(cameraIP: "192.168.1.2", port: 443)
+            Task {
+                try await NetworkManager.shared.initializeAuthentication()
+            }
+            
+            await vm.getAperture()
         }
         .onChange(of: isEditMode) { _, newValue in
             if !newValue {
                 vm.clearSelection()
             }
         }
+        .onChange(of: vm.error) { _, newError in
+            if let error = newError {
+                toastMessage = error.localizedDescription
+                showToast = true
+            } else {
+                showToast = false
+            }
+        }
         .alert("프리셋 적용", isPresented: $vm.showingShootAlert) {
             Button("취소", role: .cancel) {}
             Button("적용") {
-                // TODO: 값 세팅 연결
+                if let preset = vm.shootAlertPreset {
+                    Task {
+                        await vm.setCurrentPreset(preset)
+                    }
+                }
             }
+            .keyboardShortcut(.defaultAction) // 버튼 배경 파란색 변경 용도
         } message: {
             if let preset = vm.shootAlertPreset {
                 Text("'\(preset.name)' 프리셋을 적용하시겠습니까?")
