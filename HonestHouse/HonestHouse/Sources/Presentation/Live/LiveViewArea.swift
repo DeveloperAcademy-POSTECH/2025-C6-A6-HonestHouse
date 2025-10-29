@@ -95,13 +95,13 @@ struct LiveViewArea: View {
         
         do {
             // 1. NetworkManager 설정 (기존 API 호출용)
-            NetworkManager.shared.configure(cameraIP: "192.168.1.2", port: 443)
+            NetworkManager.shared.configure(cameraIP: "192.168.1.2", port: 8080)
             try await NetworkManager.shared.initializeAuthentication()
             
             // 2. CanonLiveViewStreamAuth 설정 (라이브뷰용)
             try await viewModel.configureCamera(
                 ipAddress: "192.168.1.2",
-                port: 443, 
+                port: 8080, 
                 username: "",
                 password: ""
             )

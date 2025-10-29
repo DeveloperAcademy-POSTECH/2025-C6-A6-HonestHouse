@@ -19,7 +19,7 @@ struct CameraConnectionView: View {
     var connectionView: some View {
         VStack {
             Button {
-                NetworkManager.shared.configure(cameraIP: "192.168.1.2", port: 443)
+                NetworkManager.shared.configure(cameraIP: "192.168.1.2", port: 8080)
                 Task {
                     try await NetworkManager.shared.initializeAuthentication()
                 }

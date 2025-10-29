@@ -85,10 +85,10 @@ class CanonLiveViewStreamAuth: NSObject, ObservableObject {
     // MARK: - Public Methods
     
     /// 카메라 설정 및 인증 매니저 초기화
-    func configureCamera(ipAddress: String, port: Int = 443, username: String = "", password: String = "") async throws {
+    func configureCamera(ipAddress: String, port: Int = 8080, username: String = "", password: String = "") async throws {
         self.cameraIP = ipAddress
         self.port = port
-        self.baseURL = "https://\(ipAddress):\(port)/ccapi/ver100"
+        self.baseURL = "http://\(ipAddress):\(port)/ccapi/ver100"
         
         // SSL 신뢰 호스트 추가
         sslDelegate.addTrustedHost(ipAddress)

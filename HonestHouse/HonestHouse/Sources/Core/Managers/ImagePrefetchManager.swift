@@ -38,3 +38,19 @@ final class ImagePrefetchManager: ImagePrefetchManagerType {
         prefetcher = nil
     }
 }
+
+// MARK: - StubImagePrefetchManager
+
+final class StubImagePrefetchManager: ImagePrefetchManagerType {
+    func startPrefetch(urls: [String]) {
+        return
+    }
+    
+    func stopAll() {
+        return
+    }
+    
+    func savePhotos(photos: [Photo]) async throws {
+        return
+    }
+}

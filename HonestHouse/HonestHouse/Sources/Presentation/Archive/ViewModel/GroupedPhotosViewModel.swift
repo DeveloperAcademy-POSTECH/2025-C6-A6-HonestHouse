@@ -10,13 +10,15 @@ import SwiftUI
 @MainActor
 @Observable
 class GroupedPhotosViewModel {
+
     private var visionManager: VisionManagerType
     private var photoManager: PhotoManagerType
+    private var imagePrefetchManager: ImagePrefetchManagerType
     private var container: DIContainer
-    
+
     var photosFromSelection: [Photo]
     var selectedPhotosInGroup: [Photo] = []
-    
+
     var groupingState: GroupingState = .idle
     var savingState: SavingState = .idle
     
@@ -27,6 +29,7 @@ class GroupedPhotosViewModel {
         self.container = container
         visionManager = container.managers.visionManager
         photoManager = container.managers.photoManager
+        imagePrefetchManager = container.managers.imagePrefetchManager
         
         self.photosFromSelection = selectedPhotos
     }
@@ -47,13 +50,19 @@ class GroupedPhotosViewModel {
         
         if case .loading = groupingState { return }
         if case .success = groupingState { return }
-        
+
         groupingState = .loading
-        
+
         Task {
             do {
                 let result = try await visionManager.analyzeImages(photosFromSelection, threshold: 0.8)
                 groupingState = .success(result)
+
+                // 그룹화 완료 후 그룹 내 이미지들 prefetch 시작
+                let allGroupedUrls = result.flatMap { $0.photos.map { $0.url } }
+                
+                imagePrefetchManager.startPrefetch(urls: allGroupedUrls)
+                
             } catch let error as VisionError {
                 groupingState = .failure(GroupingError.from(visionError: error))
             } catch {
@@ -86,6 +95,13 @@ class GroupedPhotosViewModel {
         } else {
             selectedPhotosInGroup.append(photo)
         }
+    }
+
+    // MARK: - Prefetch 관리
+
+    /// Prefetch 중단
+    func stopPrefetching() {
+        imagePrefetchManager.stopAll()
     }
 }
 
