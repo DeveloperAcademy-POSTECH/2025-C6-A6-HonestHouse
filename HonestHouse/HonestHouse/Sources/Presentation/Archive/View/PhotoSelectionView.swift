@@ -56,8 +56,15 @@ struct PhotoSelectionView: View {
                     showToast = false
                 }
             }
-
-    }
+            // 메모리 경고 시 prefetch 중단
+            .onReceive(NotificationCenter.default.publisher(for: UIApplication.didReceiveMemoryWarningNotification)) { _ in
+                vm.cancelPrefetching()
+            }
+            // 뷰 사라질 때 prefetch 중단
+            .onDisappear {
+                vm.cancelPrefetching()
+            }
+        }
     
     private func photoSelectionGridView() -> some View {
         ScrollView {
@@ -70,7 +77,7 @@ struct PhotoSelectionView: View {
                         isSelected: vm.selectedPhotos.contains(where: { $0.url == url }),
                         onTapSelectionGridCell: { vm.toggleGridCell(for: photo) }
                     )
-                    .id(url)  // URL을 id로 사용
+                    .id(url)
                 }
                 
                 if vm.hasMore {

@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Kingfisher
 
 @Observable
 final class PhotoSelectionViewModel {
@@ -18,22 +19,27 @@ final class PhotoSelectionViewModel {
     
     private var container: DIContainer
     private var imageOperationsService: ImageOperationsServiceType
+    private var imagePrefetchManager: ImagePrefetchManagerType
     
     var state: ArchiveState<Success, Failure> = .idle
-    
+
     var storageList: StorageList?
     var directoryList: DirectoryList?
     var contentList: ContentList?
-    
+
     var presentStorage: String?
     var presentDirectory: String?
-    
+
     var currentPage: Int = 1
     var isLoading: Bool = false
     var hasMore: Bool = true
     var entireContentUrls: [String] = []
-    
+
     var selectedPhotos: [Photo] = []
+    
+    // 캐시 관련 변수 (뷰 복원 시 API 재호출 방지)
+    private var cachedUrls: [String] = []
+    private var isCacheValid: Bool = false
     
     init(container: DIContainer) {
         self.container = container
@@ -51,6 +57,7 @@ extension PhotoSelectionViewModel: ArchiveErrorHandleable {
             container.navigationRouter.push(to: .groupedPhotos(selectedPhotos))
         }
     }
+
     
     func handleError(_ error: Error) {
         if let selectionError = error as? SelectionError {
@@ -116,18 +123,31 @@ extension PhotoSelectionViewModel: ArchiveErrorHandleable {
     
     /// 전체 페이지 초기화 및 1페이지 로딩 (state 전환)
     func fetchFirstPageImage() async {
-        
+        // 캐시가 유효하면 API 호출 없이 복원
+        if isCacheValid, !cachedUrls.isEmpty {
+            entireContentUrls = cachedUrls
+            state = .success(entireContentUrls)
+            return
+        }
+
         state = .loading
-        
+
         do {
             try await setPresentStorage()
             guard let storage = presentStorage else { throw SelectionError.generic }
-            
+
             try await setPresentDirectory(storage: storage)
             resetPaging()
             try await loadCurrentPage()
-            
+
+            // 캐시 저장
+            cachedUrls = entireContentUrls
+            isCacheValid = true
+
             state = .success(entireContentUrls)
+
+            // API 완료 후 전체 이미지 prefetch 시작 (Kingfisher가 자동으로 관리)
+            imagePrefetchManager.startPrefetch(urls: entireContentUrls)
         } catch {
             handleError(error)
         }
@@ -163,11 +183,14 @@ extension PhotoSelectionViewModel: ArchiveErrorHandleable {
         if let urls = contentList?.url, !urls.isEmpty {
             entireContentUrls.append(contentsOf: urls)
             currentPage += 1
+
+            // 캐시 업데이트
+            cachedUrls = entireContentUrls
         } else {
             hasMore = false
         }
     }
-    
+
     // 스크롤 시 추가 로딩 (state 유지)
     func loadCurrentPageSafely() async {
         do {
@@ -177,13 +200,28 @@ extension PhotoSelectionViewModel: ArchiveErrorHandleable {
             handleError(error)
         }
     }
-    
+
     func toggleGridCell(for photo: Photo) {
         if let index = selectedPhotos.firstIndex(where: { $0.url == photo.url }) {
             selectedPhotos.remove(at: index)
         } else {
             selectedPhotos.append(photo)
         }
+    }
+
+    // MARK: - Prefetching (단순화)
+
+    /// Prefetch 중단 (메모리 경고 또는 뷰 사라질 때)
+    func cancelPrefetching() {
+        imagePrefetchManager.stopAll()
+    }
+
+    /// 캐시 무효화
+    func invalidateCache() {
+        cachedUrls.removeAll()
+        isCacheValid = false
+        
+        imagePrefetchManager.stopAll()
     }
 }
 
