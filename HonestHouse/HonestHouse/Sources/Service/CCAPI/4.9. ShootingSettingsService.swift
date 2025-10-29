@@ -42,6 +42,7 @@ protocol ShootingSettingsServiceType {
 final class ShootingSettingsService: BaseService, ShootingSettingsServiceType {
     func getShootingMode(with version: VersionType) async throws -> ShootingSettings.ShootingModeResponse {
         let response = try await request(ShootingSettingsTarget.getShootingMode, decoding: ShootingSettings.ShootingModeResponse.self)
+        
         return response
     }
 
@@ -138,5 +139,21 @@ final class ShootingSettingsService: BaseService, ShootingSettingsServiceType {
     func putPictureStyle(with version: VersionType, request: ShootingSettings.PictureStyleRequest) async throws -> ShootingSettings.PictureStyleResponse {
         let response = try await self.request(ShootingSettingsTarget.putPictureStyle(request), decoding: ShootingSettings.PictureStyleResponse.self)
         return response
+    }
+}
+
+// MARK: - StubShootingSettingsService
+
+class StubShootingSettingsService: ShootingSettingsServiceType {
+    func getShootingMode(with: VersionType) async throws -> ShootingSettings.ShootingModeResponse {
+        return .stub1
+    }
+    
+    func getPictureStyle(with: VersionType) async throws -> ShootingSettings.PictureStyleResponse {
+        return .stub1
+    }
+    
+    func putPictureStyle(with: VersionType, request: StringValueRequest) async throws -> ShootingSettings.PictureStyleResponse {
+        return .stub1
     }
 }

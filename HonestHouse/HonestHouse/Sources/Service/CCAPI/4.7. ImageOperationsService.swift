@@ -43,3 +43,19 @@ final class ImageOperationsService: BaseService, ImageOperationsServiceType {
         return response
     }
 }
+
+// MARK: - StubImageOperationsService
+
+class StubImageOperationsService: ImageOperationsServiceType {
+    func getStorageList() async throws -> ImageOperations.StorageListResponse {
+        return .stub1
+    }
+    
+    func getDirectoryList(storage: String) async throws -> ImageOperations.DirectoryListResponse {
+        return .stub1
+    }
+    
+    func getContentList(storage: String, directory: String, type: String, kind: String, page: Int) async throws -> ImageOperations.ContentListResponse {
+        return .stub1
+    }
+}

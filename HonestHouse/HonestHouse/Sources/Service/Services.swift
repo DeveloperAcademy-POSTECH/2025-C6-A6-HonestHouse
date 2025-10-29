@@ -30,4 +30,10 @@ class Services: ServiceType {
     }
 }
 
+// MARK: - StubServices
+
+class StubServices: ServiceType {
+    var shootingSettingsService: ShootingSettingsServiceType = StubShootingSettingsService()
+    var imageOperationsService: ImageOperationsServiceType = StubImageOperationsService()
+    var presetService: PresetServiceType = StubPresetService()
 }
