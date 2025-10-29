@@ -28,10 +28,11 @@ struct GroupedPhotosDetailView: View {
     private func groupedImagesView() -> some View {
         ForEach(vm.selectedPhotosInGroup) { photo in
             ZStack(alignment: .bottomTrailing) {
-                KFImage(URL(string: photo.url))
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                
+                ProgressiveImage(
+                    thumbnailURL: photo.thumbnailURL,
+                    originalURL: photo.url
+                )
+
                 selectionButtonView(photo: photo)
                     .frame(width: 44, height: 44)
                     .contentShape(Rectangle())
