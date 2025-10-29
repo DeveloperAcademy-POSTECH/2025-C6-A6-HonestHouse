@@ -208,3 +208,12 @@ class VisionManager: VisionManagerType {
         )
     }
 }
+
+// MARK: - StubVisionMananger
+
+final class StubVisionManager: VisionManagerType {
+    func analyzeImages(_ photos: [Photo], threshold: Float) async throws -> [SimilarPhotoGroup] {
+        // TODO: stub 만들어서 넣기
+        return [.init(photos: [], averageDistance: 0, confidence: 0)]
+    }
+}

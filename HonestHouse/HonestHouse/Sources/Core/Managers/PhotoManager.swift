@@ -87,3 +87,10 @@ final class PhotoManager: PhotoManagerType {
     }
 }
 
+// MARK: - StubPhotoManager
+
+final class StubPhotoManager: PhotoManagerType {
+    func savePhotos(photos: [Photo]) async throws {
+        return
+    }
+}
