@@ -90,6 +90,6 @@ final class Preset {
 
 extension Preset {
     static var stub1: Preset {
-        .init(name: "", shootingMode: "")
+        .init(name: "", pictureStyle: .auto, shootingMode: .av)
     }
 }
