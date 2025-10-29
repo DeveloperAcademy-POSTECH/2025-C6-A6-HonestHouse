@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum MainViewSegmentType {
+enum MainViewSegmentType: CaseIterable {
     case trishot
     case preset
     

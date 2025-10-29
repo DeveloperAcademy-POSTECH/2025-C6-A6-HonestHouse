@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum MediaType: Equatable {
+enum MediaType: Equatable, Hashable {
     case jpeg
     case cr2 //RAW
     case cr3 //RAW
