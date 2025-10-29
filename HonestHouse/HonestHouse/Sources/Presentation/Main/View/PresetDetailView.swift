@@ -15,7 +15,8 @@ struct PresetDetailView: View {
     @Environment(\.dismiss) private var dismiss
     
     let preset: Preset
-    let onDelete: (() -> Void)?
+    let mode: PresetDetailMode
+//    let onShowEditor: (Preset) -> Void
 
     @State private var mode: PresetDetailMode
     @State private var showingDeleteAlert = false

@@ -10,8 +10,11 @@ import Kingfisher
 
 struct GroupedPhotosDetailView: View {
     let groupedPhotos: SimilarPhotoGroup
-    let finalSelectedPhotos: [Photo]
-    let onTapGroupedPhoto: (Photo) -> Void
+    @Environment(GroupedPhotosViewModel.self) var vm
+    /// selectedPhotosInGroup: vm.selectedPhotosInGroup,
+   /// onTapGroupedPhoto: vm.toggleGroupedPhotoView
+//    let finalSelectedPhotos: [Photo]
+//    let onTapGroupedPhoto: (Photo) -> Void
     
     var body: some View {
         TabView {
@@ -23,7 +26,7 @@ struct GroupedPhotosDetailView: View {
     
     //MARK: View Component
     private func groupedImagesView() -> some View {
-        ForEach(groupedPhotos.photos) { photo in
+        ForEach(vm.selectedPhotosInGroup) { photo in
             ZStack(alignment: .bottomTrailing) {
                 KFImage(URL(string: photo.url))
                     .resizable()
@@ -37,8 +40,8 @@ struct GroupedPhotosDetailView: View {
     }
     
     private func selectionButtonView(photo: Photo) -> some View {
-        Button(action: { onTapGroupedPhoto(photo) }) {
-            if finalSelectedPhotos.contains(where: { $0.id == photo.id }) {
+        Button(action: { vm.toggleGroupedPhotoView(for: photo) }) {
+            if vm.selectedPhotosInGroup.contains(where: { $0.id == photo.id }) {
                 ZStack {
                     Circle()
                         .fill(Color.white)

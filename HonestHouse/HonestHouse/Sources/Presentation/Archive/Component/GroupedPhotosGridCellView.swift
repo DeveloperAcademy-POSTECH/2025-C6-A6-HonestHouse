@@ -10,15 +10,16 @@ import Kingfisher
 
 struct GroupedPhotosGridCellView: View {
     let group: SimilarPhotoGroup
-    let selectedPhotosInGroup: [Photo]
-    let onTapGroupedPhoto: (Photo) -> Void
+//    let selectedPhotosInGroup: [Photo]
+//    let onTapGroupedPhoto: (Photo) -> Void
     
     var body: some View {
         NavigationLink(
             destination: GroupedPhotosDetailView(
-                groupedPhotos: group,
-                finalSelectedPhotos: selectedPhotosInGroup,
-                onTapGroupedPhoto: onTapGroupedPhoto)
+                groupedPhotos: group
+//                finalSelectedPhotos: selectedPhotosInGroup,
+//                onTapGroupedPhoto: onTapGroupedPhoto
+            )
         ) {
             if let firstPhoto = group.photos.first {
                 KFImage(URL(string: firstPhoto.url))

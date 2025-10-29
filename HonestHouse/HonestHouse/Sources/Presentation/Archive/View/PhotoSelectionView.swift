@@ -9,17 +9,18 @@ import SwiftUI
 import Kingfisher
 
 struct PhotoSelectionView: View {
+    @EnvironmentObject var container: DIContainer
+    
+    @State var vm: PhotoSelectionViewModel
+    
+    @State private var showToast: Bool = false
+    @State private var toastMessage: String = ""
+    
     let columnCount: Int = 3
     
     var columns: [GridItem] {
         Array(repeating: GridItem(.flexible(), spacing: 2), count: columnCount)
     }
-    
-    @State var vm: PhotoSelectionViewModel = .init()
-    @EnvironmentObject var container: DIContainer
-    
-    @State private var showToast: Bool = false
-    @State private var toastMessage: String = ""
     
     var body: some View {
         NavigationStack {
@@ -46,7 +47,6 @@ struct PhotoSelectionView: View {
             .navigationTitle("카메라 이름")
             .navigationBarTitleDisplayMode(.large)
             .task {
-                vm.configure(container: container)
                 await vm.fetchFirstPageImage()
             }
             .onChange(of: vm.state) { _, newState in
@@ -91,7 +91,9 @@ struct PhotoSelectionView: View {
         VStack {
             Spacer()
             if !vm.selectedPhotos.isEmpty {
-                NavigationLink(destination: GroupedPhotosView(selectedPhotos: vm.selectedPhotos)) {
+                Button {
+                    vm.goToGroupedPhotos()
+                } label: {
                     Text("완료")
                         .font(.title3)
                         .frame(maxWidth: .infinity)
