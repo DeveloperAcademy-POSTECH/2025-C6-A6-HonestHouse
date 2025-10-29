@@ -30,7 +30,9 @@ struct CachedThumbnailImage: View {
         KFImage(URL(string: url))
             .setProcessor(DownsamplingImageProcessor(size: size))
             .cacheMemoryOnly()
+            .loadDiskFileSynchronously()  // 메인 스레드에서 디스크 캐시 확인 (빠른 표시)
             .fade(duration: 0.2)
+            .retry(maxCount: 2, interval: .seconds(1))  // WiFi Direct 연결 불안정 대비
             .onSuccess { _ in
                 loadingFailed = false
             }
@@ -60,7 +62,7 @@ struct CachedThumbnailImage: View {
         }
     }
 
-    private func errorOverlay() -> some View {
+    private func errorOverlay() -> some View { // 로딩 실패시, 뷰
         ZStack {
             if cornerRadius > 0 {
                 RoundedRectangle(cornerRadius: cornerRadius)

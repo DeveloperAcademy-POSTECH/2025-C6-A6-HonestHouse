@@ -16,5 +16,10 @@ struct PhotoSelectionDetailView<Item: SelectableItem>: View {
             thumbnailURL: item.thumbnailURL,
             originalURL: item.url
         )
+        .onDisappear {
+            // DetailView를 나갈 때 메모리 캐시 일부 정리 (메모리 사용량 감소)
+            ImageCache.default.memoryStorage.removeExpired()
+            print("🧹 [PhotoSelectionDetailView] Memory cache cleaned on disappear")
+        }
     }
 }

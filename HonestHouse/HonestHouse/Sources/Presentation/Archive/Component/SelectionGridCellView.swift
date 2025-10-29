@@ -12,6 +12,22 @@ struct SelectionGridCellView<Item: SelectableItem>: View {
     let item: Item
     let isSelected: Bool
     let onTapSelectionGridCell: () -> Void
+    let onPrefetchForDetailView: (() -> Void)?
+    let onAppear: (() -> Void)?
+
+    init(
+        item: Item,
+        isSelected: Bool,
+        onTapSelectionGridCell: @escaping () -> Void,
+        onPrefetchForDetailView: (() -> Void)? = nil,
+        onAppear: (() -> Void)? = nil
+    ) {
+        self.item = item
+        self.isSelected = isSelected
+        self.onTapSelectionGridCell = onTapSelectionGridCell
+        self.onPrefetchForDetailView = onPrefetchForDetailView
+        self.onAppear = onAppear
+    }
 
     var body: some View {
         ZStack(alignment: .bottomTrailing) {
@@ -21,6 +37,12 @@ struct SelectionGridCellView<Item: SelectableItem>: View {
                     .clipped()
                     .overlay(isSelected ? Color.black.opacity(0.3) : Color.clear)
             }
+            .simultaneousGesture(
+                TapGesture().onEnded {
+                    // NavigationLink 탭 시 즉시 DetailView용 이미지 prefetch
+                    onPrefetchForDetailView?()
+                }
+            )
             
             Button(action: onTapSelectionGridCell) {
                 Group {
@@ -41,6 +63,10 @@ struct SelectionGridCellView<Item: SelectableItem>: View {
             }
             .frame(width: 80, height: 80)
             .contentShape(Rectangle())
+        }
+        .onAppear {
+            // 화면에 보이는 즉시 해당 이미지 prefetch
+            onAppear?()
         }
     }
 }

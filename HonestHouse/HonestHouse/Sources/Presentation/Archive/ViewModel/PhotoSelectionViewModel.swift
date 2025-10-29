@@ -162,54 +162,126 @@ extension PhotoSelectionViewModel: ArchiveErrorHandleable {
     
     /// 현재 페이지에 해당하는 이미지들 불러오기 (state 관여 x)
     func loadCurrentPage() async throws {
-        guard !isLoading, hasMore else { return }
+        // 중복 호출 방지 강화
+        guard !isLoading else {
+            print("⚠️ [loadCurrentPage] Already loading, skipping...")
+            return
+        }
+        guard hasMore else {
+            print("⚠️ [loadCurrentPage] No more pages, skipping...")
+            return
+        }
         guard let storage = presentStorage,
-              let directory = presentDirectory else { throw SelectionError.generic }
-        
-        isLoading = true
-        defer { isLoading = false }
-        
-        // 현재 page의 contentList를 업데이트
-        
-        try await getContentList(
-            storage: storage,
-            directory: directory,
-            type: "jpeg",
-            kind: "list",
-            page: currentPage
-        )
-        
-        // contentList에 append
-        if let urls = contentList?.url, !urls.isEmpty {
-            entireContentUrls.append(contentsOf: urls)
-            currentPage += 1
+              let directory = presentDirectory else {
+            print("❌ [loadCurrentPage] Storage or directory not set")
+            throw SelectionError.generic
+        }
 
-            // 캐시 업데이트
-            cachedUrls = entireContentUrls
-        } else {
-            hasMore = false
+        print("📄 [loadCurrentPage] Loading page \(currentPage)...")
+        isLoading = true
+        defer {
+            isLoading = false
+            print("📄 [loadCurrentPage] Loading completed, isLoading = false")
+        }
+
+        do {
+            try await getContentList(
+                storage: storage,
+                directory: directory,
+                type: "jpeg",
+                kind: "list",
+                page: currentPage
+            )
+
+            // contentList에 append
+            if let urls = contentList?.url, !urls.isEmpty {
+                entireContentUrls.append(contentsOf: urls)
+                currentPage += 1
+
+                // 캐시 업데이트
+                cachedUrls = entireContentUrls
+                print("✅ [loadCurrentPage] Added \(urls.count) images, total: \(entireContentUrls.count)")
+            } else {
+                hasMore = false
+                print("✅ [loadCurrentPage] No more images, hasMore = false")
+            }
+        } catch {
+            print("❌ [loadCurrentPage] Error during API call: \(error)")
+            throw error
         }
     }
 
     // 스크롤 시 추가 로딩 (state 유지)
     func loadCurrentPageSafely() async {
+        // 이미 로딩 중이면 스킵 (빠른 스크롤 대비)
+        guard !isLoading else {
+            print("⚠️ [loadCurrentPageSafely] Already loading, skipping duplicate call")
+            return
+        }
+
         do {
             try await loadCurrentPage()
             state = .success(entireContentUrls)
         } catch {
+            print("❌ [loadCurrentPageSafely] Caught error: \(error)")
             handleError(error)
         }
     }
 
-    func toggleGridCell(for photo: Photo) {
-        if let index = selectedPhotos.firstIndex(where: { $0.url == photo.url }) {
-            selectedPhotos.remove(at: index)
+    func toggleGridCell(for photo: Photo, at index: Int) {
+        if let selectedIndex = selectedPhotos.firstIndex(where: { $0.url == photo.url }) {
+            // Unselect: 캐시 삭제는 하지 않음 (Kingfisher 복잡도 문제)
+            selectedPhotos.remove(at: selectedIndex)
         } else {
+            // Select: 주변 ±2 이미지 prefetch
             selectedPhotos.append(photo)
+            prefetchRange(centerIndex: index)
         }
     }
 
-    // MARK: - Prefetching (단순화)
+    // MARK: - Prefetching (동적 전략)
+
+    /// 특정 인덱스 주변 ±2 이미지를 prefetch (총 5장)
+    private func prefetchRange(centerIndex: Int) {
+        let startIndex = max(0, centerIndex - 2)
+        let endIndex = min(entireContentUrls.count - 1, centerIndex + 2)
+
+        let urlsToPrefetch = (startIndex...endIndex).map { entireContentUrls[$0] }
+        let imageUrls = urlsToPrefetch.compactMap { URL(string: $0) }
+
+        // DetailView용 1200x1200 크기로 즉시 prefetch
+        let prefetcher = ImagePrefetcher(
+            urls: imageUrls,
+            options: [
+                .backgroundDecode,
+                .processor(DownsamplingImageProcessor(size: CGSize(width: 1200, height: 1200)))
+            ]
+        )
+        prefetcher.maxConcurrentDownloads = 2
+        prefetcher.start()
+
+        print("⚡️ [Prefetch] Range [\(startIndex)~\(endIndex)] for index \(centerIndex)")
+    }
+
+    /// GridCell 탭 시 해당 이미지와 주변 ±2 이미지 prefetch
+    func prefetchImageForDetailView(index: Int) {
+        prefetchRange(centerIndex: index)
+    }
+
+    /// 화면에 보이는 셀에 대한 즉시 prefetch (단일 이미지)
+    func prefetchVisibleImage(url: String) {
+        guard let imageUrl = URL(string: url) else { return }
+
+        let prefetcher = ImagePrefetcher(
+            urls: [imageUrl],
+            options: [
+                .backgroundDecode,
+                .processor(DownsamplingImageProcessor(size: CGSize(width: 1200, height: 1200)))
+            ]
+        )
+        prefetcher.maxConcurrentDownloads = 1
+        prefetcher.start()
+    }
 
     /// Prefetch 중단 (메모리 경고 또는 뷰 사라질 때)
     func cancelPrefetching() {
@@ -220,7 +292,6 @@ extension PhotoSelectionViewModel: ArchiveErrorHandleable {
     func invalidateCache() {
         cachedUrls.removeAll()
         isCacheValid = false
-        
         imagePrefetchManager.stopAll()
     }
 }

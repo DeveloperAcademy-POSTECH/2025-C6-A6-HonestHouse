@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Kingfisher
 
 @MainActor
 @Observable
@@ -72,16 +73,18 @@ class GroupedPhotosViewModel {
     }
     
     func saveSelectedPhotos() {
-//        guard let photoManager else {
-//            savingState = .failure("PhotoManager not exist")
-//            return
-//        }
-//        
         savingState = .saving
-        
+
         Task {
             do {
                 try await photoManager.savePhotos(photos: selectedPhotosInGroup)
+
+                // 저장 완료 후 모든 캐시 삭제
+                ImageCache.default.clearMemoryCache()
+                ImageCache.default.clearDiskCache {
+                    print("🗑️ [Cache] All cache cleared after save")
+                }
+
                 savingState = .success
             } catch {
                 savingState = .failure(error.localizedDescription)
@@ -98,6 +101,26 @@ class GroupedPhotosViewModel {
     }
 
     // MARK: - Prefetch 관리
+
+    /// 특정 그룹의 이미지들을 즉시 prefetch (GridCell 탭 시 호출)
+    func prefetchGroupImages(for group: SimilarPhotoGroup) {
+
+        print("⚡️ [GroupedPhotos] Immediate prefetch for group with \(group.photos.count) images")
+
+        // DetailView에서 사용할 원본 이미지를 1200x1200으로 즉시 prefetch
+        let originalUrls = group.photos.map { $0.url }.compactMap { URL(string: $0) }
+        let prefetcher = ImagePrefetcher(
+            urls: originalUrls,
+            options: [
+                .backgroundDecode,
+                .processor(DownsamplingImageProcessor(size: CGSize(width: 1200, height: 1200)))
+            ]
+        )
+        prefetcher.maxConcurrentDownloads = 2
+        prefetcher.start()
+
+        print("   - Prefetching \(originalUrls.count) original images for DetailView")
+    }
 
     /// Prefetch 중단
     func stopPrefetching() {

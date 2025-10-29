@@ -23,6 +23,7 @@ struct ProgressiveImage: View {
                     DownsamplingImageProcessor(size: CGSize(width: 300, height: 300))
                 )
                 .cacheMemoryOnly()
+                .loadDiskFileSynchronously()  // 캐시된 썸네일 즉시 표시
                 .fade(duration: 0.1)
                 .placeholder {
                     Rectangle()
@@ -32,8 +33,10 @@ struct ProgressiveImage: View {
                 .resizable()
                 .aspectRatio(contentMode: .fit)
 
-            // 원본 이미지를 Kingfisher로 로드 (prefetch로 미리 다운로드됨)
+            // 원본 이미지를 Kingfisher로 로드 (메모리 절약을 위해 화면 크기로 다운샘플링)
             KFImage(URL(string: originalURL))
+                .setProcessor(DownsamplingImageProcessor(size: CGSize(width: 1200, height: 1200)))  // 메모리 절약
+                .cacheOriginalImage()  // 디스크에는 원본 캐시
                 .retry(maxCount: 3, interval: .seconds(2))  // 503 에러 자동 재시도
                 .fade(duration: 0.3)
                 .onSuccess { _ in

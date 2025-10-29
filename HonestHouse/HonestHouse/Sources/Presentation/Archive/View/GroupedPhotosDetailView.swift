@@ -22,6 +22,11 @@ struct GroupedPhotosDetailView: View {
         }
         .tabViewStyle(.page)
         .indexViewStyle(.page(backgroundDisplayMode: .always))
+        .onDisappear {
+            // DetailView를 나갈 때 메모리 캐시 일부 정리 (메모리 사용량 감소)
+            ImageCache.default.memoryStorage.removeExpired()
+            print("🧹 [GroupedPhotosDetailView] Memory cache cleaned on disappear")
+        }
     }
     
     //MARK: View Component

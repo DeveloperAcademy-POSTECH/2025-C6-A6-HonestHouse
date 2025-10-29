@@ -21,7 +21,7 @@ struct GroupedPhotosGridCellView: View {
         ) {
             if let firstPhoto = group.photos.first {
                 CachedThumbnailImage(
-                    url: firstPhoto.displayURL,
+                    url: firstPhoto.url,  // 원본 URL 사용 (1200x1200으로 다운샘플링됨)
                     size: CGSize(width: 400, height: 300),
                     cornerRadius: 12
                 )
@@ -43,5 +43,11 @@ struct GroupedPhotosGridCellView: View {
                 )
             }
         }
+        .simultaneousGesture(
+            TapGesture().onEnded {
+                // NavigationLink 탭 시 즉시 그룹 내 이미지들 prefetch
+                onPrefetchForDetailView?()
+            }
+        )
     }
 }
