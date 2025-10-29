@@ -11,13 +11,13 @@ import SwiftData
 struct PresetView: View {
     @EnvironmentObject private var container: DIContainer
     @Query(sort: \Preset.createdAt, order: .reverse) private var presets: [Preset]
+    @State private var vm: PresetDetailViewModel = PresetDetailViewModel()
 
     @Binding var isEditMode: Bool
     let onShowDetail: (Preset) -> Void
     let onShowEditor: (Preset?) -> Void
     let onShowCreate: () -> Void
 
-    @State private var vm: PresetViewModel
 
     init(
         container: DIContainer,

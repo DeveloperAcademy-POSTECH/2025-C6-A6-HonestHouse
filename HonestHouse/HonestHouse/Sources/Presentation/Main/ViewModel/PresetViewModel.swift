@@ -9,7 +9,7 @@ import SwiftUI
 import SwiftData
 
 @Observable
-final class PresetViewModel {
+final class PresetDetailViewModel {
     var presets: [Preset] = []
     var selectedPreset: Preset?
     var selectedPresets: Set<UUID> = []
