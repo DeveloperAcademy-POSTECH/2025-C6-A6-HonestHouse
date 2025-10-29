@@ -2,164 +2,58 @@
 //  PresetViewModel.swift
 //  HonestHouse
 //
-//  Created by BoMin Lee on 10/27/25.
+//  Created by Subeen on 10/29/25.
 //
 
+import Foundation
 import SwiftUI
-import SwiftData
 
 @Observable
-final class PresetDetailViewModel {
+final class PresetViewModel {
+    var container: DIContainer
+    var isPresetEditMode: Bool
+    var onEditModeChange: ((Bool) -> Void)?
+    
     var presets: [Preset] = []
-    var selectedPreset: Preset?
     var selectedPresets: Set<UUID> = []
-    var showingCreateSheet = false
-    var showingShootAlert = false
-    var shootAlertPreset: Preset?
     var error: PresetError?
+    
+    private var presetService: PresetServiceType
+    private var shootingControlService: ShootingControlServiceType
+    private var shootingSettingsService: ShootingSettingsServiceType
 
-    private var presetService: PresetServiceType?
-    private var shootingControlService: ShootingControlServiceType?
-    private var shootingSettingsService: ShootingSettingsServiceType?
-}
-
-extension PresetDetailViewModel: PresetErrorHandleable {
-    func configure(container: DIContainer) {
-        guard self.presetService == nil else { return }
-        self.presetService = container.services.presetService
+    enum Action {
+        case goToPresetDetail(PresetDetailMode, Preset)
+    }
+    
+    init(
+        container: DIContainer,
+        isPresetEditMode: Bool,
+        onEditModeChange: ((Bool) -> Void)? = nil
+    ) {
+        self.container = container
+        self.isPresetEditMode = isPresetEditMode
         
-        guard self .shootingControlService == nil else { return }
+        self.presetService = container.services.presetService
         self.shootingControlService = container.services.shootingControlService
-
-        guard self.shootingSettingsService == nil else { return }
         self.shootingSettingsService = container.services.shootingSettingsService
     }
-
-    func selectPreset(_ preset: Preset) {
-        selectedPreset = preset
-    }
-
-    func showCreateSheet() {
-        showingCreateSheet = true
-    }
-
-    func showShootAlert(for preset: Preset) {
-        shootAlertPreset = preset
-        showingShootAlert = true
-    }
-
-    func toggleSelection(for preset: Preset) {
-        if selectedPresets.contains(preset.id) {
-            selectedPresets.remove(preset.id)
-        } else {
-            selectedPresets.insert(preset.id)
-        }
-    }
-
-    func deleteSelectedPresets() {
-        guard let presetService else {
-            handleError(PresetError.unknown)
-            return
-        }
-
-        do {
-            for id in selectedPresets {
-                try presetService.delete(at: id)
-            }
-            selectedPresets.removeAll()
-            loadPresets()
-        } catch {
-            handleError(error)
-        }
-    }
-
-    func clearSelection() {
-        selectedPresets.removeAll()
-    }
 }
 
-//MARK: - SwiftData Related
-extension PresetDetailViewModel {
-    func loadPresets() {
-        guard let presetService else {
-            handleError(PresetError.unknown)
-            return
-        }
-
-        do {
-            presets = try presetService.fetchAll()
-            error = nil
-        } catch {
-            handleError(error)
+extension PresetViewModel {
+    
+    func send(action: Action) {
+        switch action {
+            
+        case .goToPresetDetail(let mode, let preset):
+            container.navigationRouter.push(to: .presetEditor(mode, preset))
+            
         }
     }
-
-    func createPreset(_ preset: Preset) {
-        guard let presetService else {
-            handleError(PresetError.unknown)
-            return
-        }
-
-        do {
-            try presetService.create(preset)
-            loadPresets()
-        } catch {
-            handleError(error)
-        }
-    }
-
-    func updatePreset(_ preset: Preset) {
-        guard let presetService else {
-            handleError(PresetError.unknown)
-            return
-        }
-
-        do {
-            try presetService.update(preset)
-            loadPresets()
-        } catch {
-            handleError(error)
-        }
-    }
-
-    func deletePreset(_ preset: Preset) {
-        guard let presetService else {
-            handleError(PresetError.unknown)
-            return
-        }
-
-        do {
-            try presetService.delete(preset)
-            loadPresets()
-        } catch {
-            handleError(error)
-        }
-    }
-
-    func deletePreset(at id: UUID) {
-        guard let presetService else {
-            handleError(PresetError.unknown)
-            return
-        }
-
-        do {
-            try presetService.delete(at: id)
-            loadPresets()
-        } catch {
-            handleError(error)
-        }
-    }
-}
-
-//MARK: - Shooting Settings Related
-extension PresetDetailViewModel {
+    
     /// View 진입 시 처음 호출할 용도로 만든 getAperture
     func getAperture() async {
-        guard let shootingSettingsService = shootingSettingsService else {
-            handleError(PresetError.unknown)
-            return
-        }
-        
+
         do {
             let res = try await shootingSettingsService.getAV(with: .ver100)
             print(res)
@@ -220,22 +114,60 @@ extension PresetDetailViewModel {
             handleError(error)
         }
     }
+
+    func toggleSelection(for preset: Preset) {
+        if selectedPresets.contains(preset.id) {
+            selectedPresets.remove(preset.id)
+        } else {
+            selectedPresets.insert(preset.id)
+        }
+    }
+    
+    // 편집 모드 변경
+    func setEditMode(_ value: Bool) {
+        isPresetEditMode = value
+        onEditModeChange?(value)  // 부모에게 변경 알림
+    }
+    
+    
+    func onShoot(preset: Preset)-> Void { }
+    
+    func onToggleSelection(preset: Preset) { }
+
+    func deleteSelectedPresets() {
+        do {
+            for id in selectedPresets {
+                try presetService.delete(at: id)
+            }
+            selectedPresets.removeAll()
+            loadPresets()
+        } catch {
+            handleError(error)
+        }
+    }
 }
 
-//MARK: - CCAPI
-extension PresetDetailViewModel {
+// MARK: - SwiftData
+extension PresetViewModel {
+    func loadPresets() {
+
+        do {
+            presets = try presetService.fetchAll()
+            error = nil
+        } catch {
+            handleError(error)
+        }
+    }
+}
+
+extension PresetViewModel: PresetErrorHandleable {
     private func ignoreShootingMode(action: String) async throws {
-        guard let shootingControlService else { throw PresetError.unknown }
         let request = ShootingControl.IgnoreShootingModeRequest(action: action)
         try await shootingControlService.ignoreShootingMode(with: .ver100, request: request)
     }
     
     private func getShootingMode() async throws {
-        guard let shootingSettingsService = shootingSettingsService else {
-            handleError(PresetError.unknown)
-            return
-        }
-        
+
         do {
             let res = try await shootingSettingsService.getShootingMode(with: .ver110)
             print(res)
@@ -245,56 +177,48 @@ extension PresetDetailViewModel {
     }
 
     private func setShootingMode(value: String) async throws {
-        guard let shootingSettingsService else { throw PresetError.unknown }
         let request = ShootingSettings.ShootingModeRequest(value: value)
-//        _ = try await shootingSettingsService.putShootingMode(with: .ver100, request: request)
+        _ = try await shootingSettingsService.putShootingMode(with: .ver100, request: request)
         let response = try await shootingSettingsService.putShootingMode(with: .ver110, request: request)
         print(response)
     }
 
     private func setPictureStyle(value: String) async throws {
-        guard let shootingSettingsService else { throw PresetError.unknown }
         let request = ShootingSettings.PictureStyleRequest(value: value)
         let response = try await shootingSettingsService.putPictureStyle(with: .ver100, request: request)
         print(response)
     }
 
     private func setAperture(value: String) async throws {
-        guard let shootingSettingsService else { throw PresetError.unknown }
         let request = ShootingSettings.AVRequest(value: value)
         let response = try await shootingSettingsService.putAV(with: .ver100, request: request)
         print(response)
     }
 
     private func setShutterSpeed(value: String) async throws {
-        guard let shootingSettingsService else { throw PresetError.unknown }
         let request = ShootingSettings.TVRequest(value: value)
         _ = try await shootingSettingsService.putTV(with: .ver100, request: request)
     }
 
     private func setISO(value: String) async throws {
-        guard let shootingSettingsService else { throw PresetError.unknown }
         let request = ShootingSettings.ISORequest(value: value)
         let response = try await shootingSettingsService.putISO(with: .ver100, request: request)
         print(response)
     }
 
     private func setExposureCompensation(value: String) async throws {
-        guard let shootingSettingsService else { throw PresetError.unknown }
         let request = ShootingSettings.ExposureCompensationRequest(value: value)
         let response = try await shootingSettingsService.putExposureCompensation(with: .ver100, request: request)
         print(response)
     }
 
     private func setColorTemperature(value: Int) async throws {
-        guard let shootingSettingsService else { throw PresetError.unknown }
         let request = ShootingSettings.ColorTemperatureRequest(value: value)
         let response = try await shootingSettingsService.putColorTemperature(with: .ver100, request: request)
         print(response)
     }
 
     private func setWbShift(blueAmber: Int, magentaGreen: Int) async throws {
-        guard let shootingSettingsService else { throw PresetError.unknown }
         let wbShift = ShootingSettings.WBShiftRequest.WBShift(blueAmber: blueAmber, magentaGreen: magentaGreen)
         let request = ShootingSettings.WBShiftRequest(value: wbShift)
         let response = try await shootingSettingsService.putWbShift(with: .ver100, request: request)
