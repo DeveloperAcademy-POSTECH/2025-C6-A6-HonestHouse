@@ -7,6 +7,7 @@
 
 import Foundation
 
+enum ShootingControl { }
 enum ShootingSettings { }
 enum LiveView { }
 enum ImageOperations { }
