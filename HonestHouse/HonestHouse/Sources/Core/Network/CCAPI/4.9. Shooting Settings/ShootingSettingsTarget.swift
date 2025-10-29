@@ -8,25 +8,27 @@
 import Moya
 
 enum ShootingSettingsTarget {
-    case getShootingSetting(VersionType)                /// 모든 촬영 매개변수
-    case getShootingMode                                /// 사진촬영 모드
-    case putShootingMode(StringValueRequest)            /// 사진촬영 모드
-    case getAv                                          /// 조리개
-    case putAv(StringValueRequest)                      /// 조리개
+    case getShootingSetting(VersionType)                                         /// 모든 촬영 매개변수
+    case getShootingMode                                                         /// 사진촬영 모드(다이얼 없는)
+    case putShootingMode(ShootingSettings.ShootingModeRequest)                   /// 사진촬영 모드(다이얼 없는)
+    case getShootingModeDial                                                     /// 사진촬영 모드(다이얼 있는)
+    case putShootingModeDial(ShootingSettings.ShootingModeRequest)               /// 사진촬영 모드(다이얼 있는)
+    case getAv                                                                   /// 조리개
+    case putAv(ShootingSettings.AVRequest)                                       /// 조리개
     case getTv                                          /// 셔터스피드
-    case putTv(StringValueRequest)                      /// 셔터스피드
+    case putTv(ShootingSettings.TVRequest)                      /// 셔터스피드
     case getIso                                         /// ISO
-    case putIso(StringValueRequest)                     /// ISO
+    case putIso(ShootingSettings.ISORequest)                     /// ISO
     case getExposureCompensation                        /// 노출보정
-    case putExposureCompensation(StringValueRequest)    /// 노출보정
+    case putExposureCompensation(ShootingSettings.ExposureCompensationRequest)    /// 노출보정
     case getWhiteBalance                                /// 화이트밸런스
-    case putWhiteBalance(StringValueRequest)            /// 화이트밸런스
+    case putWhiteBalance(ShootingSettings.WhiteBalanceRequest)            /// 화이트밸런스
     case getColorTemperature                             /// 색온도
-    case putColorTemperature(IntValueRequest)            /// 색온도
+    case putColorTemperature(ShootingSettings.ColorTemperatureRequest)            /// 색온도
     case getWbShift                                     /// 화이트밸런스 보정 (Blue/Amber, Green/Magenta)
     case putWbShift(ShootingSettings.WBShiftRequest)    /// 화이트밸런스 보정 (Blue/Amber, Green/Magenta)
     case getPictureStyle                                /// 픽쳐스타일
-    case putPictureStyle(StringValueRequest)            /// 픽쳐스타일
+    case putPictureStyle(ShootingSettings.PictureStyleRequest)            /// 픽쳐스타일
 }
 
 extension ShootingSettingsTarget: BaseTargetType {
@@ -35,11 +37,18 @@ extension ShootingSettingsTarget: BaseTargetType {
         case .getShootingSetting(let version):
             return ShootingSettingsAPI.getShootingSetting.path(with: version)
             
+        //MARK: R50V용 v110(ver 1.1.0.)으로 변경
         case .getShootingMode:
-            return ShootingSettingsAPI.shootingMode.path(with: .ver100)
-            
+            return ShootingSettingsAPI.shootingMode.path(with: .ver110)
+        //MARK: R50V용 v110(ver 1.1.0.)으로 변경
         case .putShootingMode:
-            return ShootingSettingsAPI.shootingMode.path(with: .ver100)
+            return ShootingSettingsAPI.shootingMode.path(with: .ver110)
+            
+        case .getShootingModeDial:
+            return ShootingSettingsAPI.shootingModeDial.path(with: .ver100)
+            
+        case .putShootingModeDial:
+            return ShootingSettingsAPI.shootingModeDial.path(with: .ver100)
             
         case .getAv, .putAv:
             return ShootingSettingsAPI.av.path(with: .ver100)
@@ -71,6 +80,7 @@ extension ShootingSettingsTarget: BaseTargetType {
         switch self {
         case .getShootingSetting,
                 .getShootingMode,
+                .getShootingModeDial,
                 .getAv,
                 .getTv,
                 .getIso,
@@ -82,6 +92,7 @@ extension ShootingSettingsTarget: BaseTargetType {
                 return .get
 
         case .putShootingMode,
+                .putShootingModeDial,
                 .putAv,
                 .putTv,
                 .putIso,
@@ -99,6 +110,7 @@ extension ShootingSettingsTarget: BaseTargetType {
         switch self {
         case .getShootingSetting,
                 .getShootingMode,
+                .getShootingModeDial,
                 .getAv,
                 .getTv,
                 .getIso,
@@ -110,6 +122,9 @@ extension ShootingSettingsTarget: BaseTargetType {
             return .requestPlain
     
         case .putShootingMode(let request):
+            return .requestJSONEncodable(request)
+            
+        case .putShootingModeDial(let request):
             return .requestJSONEncodable(request)
 
         case .putAv(let request):

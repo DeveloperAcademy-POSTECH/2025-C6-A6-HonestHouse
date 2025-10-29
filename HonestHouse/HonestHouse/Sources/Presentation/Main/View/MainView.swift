@@ -25,64 +25,24 @@ struct MainView: View {
                         Text("TriShot View")
                     case .preset:
                         PresetView(
-                            container: container,
                             isEditMode: $vm.isEditMode,
                             onShowDetail: vm.showDetailView,
-                            onShowEditor: vm.showEditorView,
-                            onShowCreate: vm.showCreateSheet
+                            onShowCreate: vm.showCreateView
                         )
                     }
                 }
                 .padding(.top, 9)
             }
             .padding(.horizontal, 16)
-            .navigationDestination(item: $vm.selectedDetailPreset) { preset in
+            .navigationDestination(item: $vm.selectedPreset) { preset in
                 PresetDetailView(
                     preset: preset,
-                    onShowEditor: vm.showEditorView
-                )
-            }
-            .navigationDestination(item: $vm.selectedEditorPreset) { preset in
-                PresetEditorTemporaryView(
-                    preset: preset,
-                    onSave: { name, mode, pictureStyle, aperture, shutterSpeed, iso, exposureCompensation, colorTemperature, tintBlueAmber, tintMagentaGreen in
-                        preset.name = name
-                        preset.shootingMode = mode
-                        preset.pictureStyle = pictureStyle
-                        preset.aperture = aperture
-                        preset.shutterSpeed = shutterSpeed
-                        preset.iso = iso
-                        preset.exposureCompensation = exposureCompensation
-                        preset.colorTemperature = colorTemperature
-                        preset.tintBlueAmber = tintBlueAmber
-                        preset.tintMagentaGreen = tintMagentaGreen
-                        preset.updatedAt = Date()
-                        try? modelContext.save()
-                    },
-                    onDelete: {
+                    onDelete: preset.name.isEmpty ? nil : {
                         modelContext.delete(preset)
                         try? modelContext.save()
-                        vm.selectedEditorPreset = nil
+                        vm.selectedPreset = nil
                     }
                 )
-            }
-            .sheet(isPresented: $vm.showingCreateSheet) {
-                PresetEditorTemporaryView { name, mode, pictureStyle, aperture, shutterSpeed, iso, exposureCompensation, colorTemperature, tintBlueAmber, tintMagentaGreen in
-                    let newPreset = Preset(
-                        name: name,
-                        pictureStyle: pictureStyle,
-                        shootingMode: mode,
-                        aperture: aperture,
-                        shutterSpeed: shutterSpeed,
-                        iso: iso,
-                        exposureCompensation: exposureCompensation,
-                        colorTemperature: colorTemperature,
-                        tintBlueAmber: tintBlueAmber,
-                        tintMagentaGreen: tintMagentaGreen
-                    )
-                    modelContext.insert(newPreset)
-                    try? modelContext.save()
-                }
             }
         }
     }

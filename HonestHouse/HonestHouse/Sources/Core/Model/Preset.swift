@@ -15,9 +15,38 @@ final class Preset {
     var createdAt: Date
     var updatedAt: Date
 
-    var pictureStyle: String?
-    var shootingMode: String
+    // MARK: - Private Storage (SwiftData 저장용)
+    private var pictureStyleRawValue: String
+    private var shootingModeRawValue: String
 
+    // MARK: - Computed Properties (사용자 접근용)
+    @Transient
+    var pictureStyle: PictureStyleType {
+        get {
+            guard let style = PictureStyleType(rawValue: pictureStyleRawValue) else {
+                fatalError("Invalid picture style: \(pictureStyleRawValue)")
+            }
+            return style
+        }
+        set {
+            pictureStyleRawValue = newValue.rawValue
+        }
+    }
+
+    @Transient
+    var shootingMode: ShootingModeType {
+        get {
+            guard let mode = ShootingModeType(rawValue: shootingModeRawValue) else {
+                fatalError("Invalid shooting mode: \(shootingModeRawValue)")
+            }
+            return mode
+        }
+        set {
+            shootingModeRawValue = newValue.rawValue
+        }
+    }
+
+    // MARK: - Optional Settings
     var aperture: String?
     var shutterSpeed: String?
     var iso: String?
@@ -31,8 +60,8 @@ final class Preset {
     init(
         id: UUID = UUID(),
         name: String,
-        pictureStyle: String? = nil,
-        shootingMode: String,
+        pictureStyle: PictureStyleType,
+        shootingMode: ShootingModeType,
         aperture: String? = nil,
         shutterSpeed: String? = nil,
         iso: String? = nil,
@@ -45,8 +74,8 @@ final class Preset {
     ) {
         self.id = id
         self.name = name
-        self.pictureStyle = pictureStyle
-        self.shootingMode = shootingMode
+        self.pictureStyleRawValue = pictureStyle.rawValue
+        self.shootingModeRawValue = shootingMode.rawValue
         self.aperture = aperture
         self.shutterSpeed = shutterSpeed
         self.iso = iso

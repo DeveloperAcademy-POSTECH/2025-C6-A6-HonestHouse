@@ -13,9 +13,7 @@ final class MainViewModel {
     
     var segments: [MainViewSegmentType] = [.trishot, .preset]
     var isEditMode: Bool = false
-    var selectedDetailPreset: Preset?
-    var selectedEditorPreset: Preset?
-    var showingCreateSheet = false
+    var selectedPreset: Preset?
 
     var showEditButton: Bool {
         selectedSegment == .preset
@@ -36,14 +34,11 @@ final class MainViewModel {
     }
 
     func showDetailView(for preset: Preset) {
-        selectedDetailPreset = preset
+        selectedPreset = preset
     }
 
-    func showEditorView(for preset: Preset? = nil) {
-        selectedEditorPreset = preset
-    }
-
-    func showCreateSheet() {
-        showingCreateSheet = true
+    func showCreateView() {
+        let tempPreset = Preset(name: "", pictureStyle: .auto, shootingMode: .av)
+        selectedPreset = tempPreset
     }
 }

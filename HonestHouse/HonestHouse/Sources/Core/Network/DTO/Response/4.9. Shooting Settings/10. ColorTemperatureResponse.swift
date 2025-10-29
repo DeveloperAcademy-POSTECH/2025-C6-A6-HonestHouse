@@ -9,7 +9,7 @@ extension ShootingSettings {
     
     /// 4.9.10. 색온도
     struct ColorTemperatureResponse: BaseResponse {
-        let value: String?
+        let value: Int?
         let ability: Ability?
     }
 }
