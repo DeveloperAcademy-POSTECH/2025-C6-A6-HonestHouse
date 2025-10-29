@@ -9,7 +9,17 @@ import SwiftUI
 
 @Observable
 final class MainViewModel {
+    
+    enum Action {
+        case goToTriShotSelection
+        case goToTriShotSetting
+        case goToTriMode
+        case goToPresetEditor(PresetDetailMode, Preset)
+        case goToPhotoSelection
+    }
+    
     private(set) var selectedSegment: MainViewSegmentType = .trishot
+    private var container: DIContainer
     
     var segments: [MainViewSegmentType] = [.trishot, .preset]
     var isEditMode: Bool = false
@@ -17,6 +27,29 @@ final class MainViewModel {
 
     var showEditButton: Bool {
         selectedSegment == .preset
+    }
+    
+    init(container: DIContainer) {
+        self.container = container
+    }
+    
+    func send(action: Action) {
+        switch action {
+        case .goToTriShotSelection:
+            container.navigationRouter.push(to: .trishotSelection)
+            
+        case .goToTriShotSetting:
+            container.navigationRouter.push(to: .trishotSetting)
+            
+        case .goToTriMode:
+            container.navigationRouter.push(to: .trimode)
+            
+        case .goToPresetEditor(let mode, let preset):
+            container.navigationRouter.push(to: .presetEditor(mode, preset))
+            
+        case .goToPhotoSelection:
+            container.navigationRouter.push(to: .photoSelection)
+        }
     }
     
     func setSelectedSegment(_ segment: MainViewSegmentType) {
@@ -33,12 +66,20 @@ final class MainViewModel {
         isEditMode = false
     }
 
-    func showDetailView(for preset: Preset) {
-        selectedPreset = preset
-    }
+//    func showDetailView(for preset: Preset) {
+//        selectedDetailPreset = preset
+//    }
+//
+//    func showEditorView(for preset: Preset? = nil) {
+//        selectedEditorPreset = preset
+//    }
 
-    func showCreateView() {
-        let tempPreset = Preset(name: "", pictureStyle: .auto, shootingMode: .av)
-        selectedPreset = tempPreset
+    func showCreateSheet() {
+        showingCreateSheet = true
     }
+}
+
+extension MainViewModel {
+    
+    
 }

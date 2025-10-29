@@ -11,10 +11,10 @@ import SwiftData
 struct MainView: View {
     @EnvironmentObject private var container: DIContainer
     @Environment(\.modelContext) private var modelContext
-    @State private var vm: MainViewModel = .init()
+    @State var vm: MainViewModel
     
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $container.navigationRouter.destinations) {
             VStack(spacing: 18) {
                 cameraAndArchiveHeaderView()
                 segmentedControlView()
@@ -34,16 +34,9 @@ struct MainView: View {
                 .padding(.top, 9)
             }
             .padding(.horizontal, 16)
-            .navigationDestination(item: $vm.selectedPreset) { preset in
-                PresetDetailView(
-                    preset: preset,
-                    onDelete: preset.name.isEmpty ? nil : {
-                        modelContext.delete(preset)
-                        try? modelContext.save()
-                        vm.selectedPreset = nil
-                    }
-                )
-            }
+        }
+        .navigationDestination(for: NavigationDestination.self) {
+            NavigationRoutingView(destination: $0)
         }
     }
     
@@ -97,6 +90,6 @@ struct MainView: View {
 }
 
 #Preview {
-    MainView()
+    MainView(vm: .init(container: .stub))
 }
 

@@ -5,4 +5,20 @@
 //  Created by Subeen on 10/22/25.
 //
 
+
 import Foundation
+
+enum NavigationDestination: Hashable {
+    
+    // Trishot
+    case trishotSetting
+    case trishotSelection
+    case trimode
+    
+    // Preset
+    case presetEditor(PresetDetailMode, Preset) // TODO: PresetModeType
+    
+    // Photos
+    case photoSelection
+    case groupedPhotos([Photo])
+}
