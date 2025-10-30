@@ -12,7 +12,6 @@ final class MainViewModel {
     
     enum Action {
         case goToTriShotSelection
-        case goToTriShotSetting
         case goToTriMode
         case goToPresetEditor(PresetDetailMode, Preset)
         case goToPhotoSelection
@@ -37,9 +36,6 @@ final class MainViewModel {
         switch action {
         case .goToTriShotSelection:
             container.navigationRouter.push(to: .trishotSelection)
-            
-        case .goToTriShotSetting:
-            container.navigationRouter.push(to: .trishotSetting)
             
         case .goToTriMode:
             container.navigationRouter.push(to: .trimode)

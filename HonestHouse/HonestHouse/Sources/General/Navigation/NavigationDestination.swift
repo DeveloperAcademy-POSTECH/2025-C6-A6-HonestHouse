@@ -11,7 +11,6 @@ import Foundation
 enum NavigationDestination: Hashable {
     
     // Trishot
-    case trishotSetting
     case trishotSelection
     case trimode
     

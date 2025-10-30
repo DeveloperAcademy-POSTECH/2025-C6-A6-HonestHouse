@@ -21,14 +21,14 @@ struct MainView: View {
                 segmentedControlView()
                 
                 Picker("", selection: $vm.selectedSegment) {
-                    ForEach(MainViewSegmentType.allCases, id: \.self) { option in
+                    ForEach(MainViewSegmentType.allCases, id: \.self) { _ in
                     }
                 }
                 .pickerStyle(.palette)
                 
                 switch vm.selectedSegment {
                 case .trishot:
-                    TrishotView()
+                    TrishotSettingView()
                     
                 case .preset:
                     PresetView(

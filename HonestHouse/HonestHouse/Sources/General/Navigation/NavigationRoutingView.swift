@@ -15,8 +15,6 @@ struct NavigationRoutingView: View {
         switch destination {
             
         // Trishot
-        case .trishotSetting:
-            Text("trishop setting")
         case .trishotSelection:
             Text("trimode selection")
         case .trimode:
