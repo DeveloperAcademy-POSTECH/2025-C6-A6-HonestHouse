@@ -17,8 +17,7 @@ final class ShootingControlService: BaseService, ShootingControlServiceType {
     }
 }
 
-final class StubShootingControlServiceType: ShootingControlServiceType {
+final class StubShootingControlService: ShootingControlServiceType {
     func ignoreShootingMode(with: VersionType, request: ShootingControl.IgnoreShootingModeRequest) async throws {
-        return 
     }
 }

@@ -224,8 +224,4 @@ class StubShootingSettingsService: ShootingSettingsServiceType {
     func getPictureStyle(with: VersionType) async throws -> ShootingSettings.PictureStyleResponse {
         return .stub1
     }
-    
-    func putPictureStyle(with: VersionType, request: StringValueRequest) async throws -> ShootingSettings.PictureStyleResponse {
-        return .stub1
-    }
 }
