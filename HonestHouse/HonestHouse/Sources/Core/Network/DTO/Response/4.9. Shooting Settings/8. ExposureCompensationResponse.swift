@@ -23,4 +23,11 @@ extension ShootingSettings.ExposureCompensationResponse {
             ability: ability
         )
     }
+    
+    static var stub1: ShootingSettings.ExposureCompensationResponse {
+        .init(
+            value: "",
+            ability: [""]
+        )
+    }
 }

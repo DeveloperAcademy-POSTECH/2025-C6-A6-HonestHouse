@@ -10,8 +10,9 @@ import SwiftUI
 @MainActor
 @Observable
 class GroupedPhotosViewModel {
-    private var visionManager: VisionManagerType?
-    private var photoManager: PhotoManagerType?
+    private var visionManager: VisionManagerType
+    private var photoManager: PhotoManagerType
+    private var container: DIContainer
     
     var photosFromSelection: [Photo]
     var selectedPhotosInGroup: [Photo] = []
@@ -19,23 +20,30 @@ class GroupedPhotosViewModel {
     var groupingState: GroupingState = .idle
     var savingState: SavingState = .idle
     
-    init(selectedPhotos: [Photo]) {
+    init(
+        container: DIContainer,
+        selectedPhotos: [Photo]
+    ) {
+        self.container = container
+        visionManager = container.managers.visionManager
+        photoManager = container.managers.photoManager
+        
         self.photosFromSelection = selectedPhotos
     }
     
-    func configure(container: DIContainer) {
-        guard self.visionManager == nil else { return }
-        self.visionManager = container.services.visionManager
-        
-        guard self.photoManager == nil else { return }
-        self.photoManager = container.services.photoManager
-    }
+//    func configure(container: DIContainer) {
+//        guard self.visionManager == nil else { return }
+//        self.visionManager = container.services.visionManager
+//        
+//        guard self.photoManager == nil else { return }
+//        self.photoManager = container.services.photoManager
+//    }
     
     func startGrouping() {
-        guard let visionManager else {
-            groupingState = .failure(.unknown)
-            return
-        }
+//        guard let visionManager else {
+//            groupingState = .failure(.unknown)
+//            return
+//        }
         
         if case .loading = groupingState { return }
         if case .success = groupingState { return }
@@ -55,11 +63,11 @@ class GroupedPhotosViewModel {
     }
     
     func saveSelectedPhotos() {
-        guard let photoManager else {
-            savingState = .failure("PhotoManager not exist")
-            return
-        }
-        
+//        guard let photoManager else {
+//            savingState = .failure("PhotoManager not exist")
+//            return
+//        }
+//        
         savingState = .saving
         
         Task {
@@ -78,5 +86,11 @@ class GroupedPhotosViewModel {
         } else {
             selectedPhotosInGroup.append(photo)
         }
+    }
+}
+
+extension GroupedPhotosViewModel {
+    func goToMain() {
+        container.navigationRouter.popToRoot()
     }
 }

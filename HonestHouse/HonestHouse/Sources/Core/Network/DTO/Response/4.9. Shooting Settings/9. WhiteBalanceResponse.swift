@@ -23,4 +23,11 @@ extension ShootingSettings.WhiteBalanceResponse {
             ability: ability
         )
     }
+    
+    static var stub1: ShootingSettings.WhiteBalanceResponse {
+        .init(
+            value: "",
+            ability: [""]
+        )
+    }
 }

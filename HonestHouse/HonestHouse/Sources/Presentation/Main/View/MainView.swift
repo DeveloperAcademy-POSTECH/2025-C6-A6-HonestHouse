@@ -11,38 +11,41 @@ import SwiftData
 struct MainView: View {
     @EnvironmentObject private var container: DIContainer
     @Environment(\.modelContext) private var modelContext
-    @State private var vm: MainViewModel = .init()
-    
+    @State var vm: MainViewModel
+    @State var isPresetEditMode: Bool = false
+     
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $container.navigationRouter.destinations) {
             VStack(spacing: 18) {
                 cameraAndArchiveHeaderView()
                 segmentedControlView()
                 
-                Group {
-                    switch vm.selectedSegment {
-                    case .trishot:
-                        Text("TriShot View")
-                    case .preset:
-                        PresetView(
-                            isEditMode: $vm.isEditMode,
-                            onShowDetail: vm.showDetailView,
-                            onShowCreate: vm.showCreateView
-                        )
+                Picker("", selection: $vm.selectedSegment) {
+                    ForEach(MainViewSegmentType.allCases, id: \.self) { _ in
                     }
                 }
-                .padding(.top, 9)
+                .pickerStyle(.palette)
+                
+                switch vm.selectedSegment {
+                case .trishot:
+                    TrishotSettingView()
+                    
+                case .preset:
+                    PresetView(
+                        vm: PresetViewModel(
+                            container: container,
+                            isPresetEditMode: isPresetEditMode,
+                            onEditModeChange: { newValue in
+                                isPresetEditMode = newValue
+                            }
+                        )
+                    )
+                }
+                
             }
             .padding(.horizontal, 16)
-            .navigationDestination(item: $vm.selectedPreset) { preset in
-                PresetDetailView(
-                    preset: preset,
-                    onDelete: preset.name.isEmpty ? nil : {
-                        modelContext.delete(preset)
-                        try? modelContext.save()
-                        vm.selectedPreset = nil
-                    }
-                )
+            .navigationDestination(for: NavigationDestination.self) {
+                NavigationRoutingView(destination: $0)
             }
         }
     }
@@ -50,7 +53,7 @@ struct MainView: View {
     private func cameraAndArchiveHeaderView() -> some View {
         HStack {
             Button {
-                // TODO: 카메라 설정 뷰 연결
+                // TODO: 카메라 연결
             } label: {
                 Image(systemName: "camera.badge.ellipsis")
                     .resizable()
@@ -63,7 +66,7 @@ struct MainView: View {
                 Button {
                     vm.toggleEditMode()
                 } label: {
-                    Text(vm.isEditMode ? "완료" : "편집")
+                    Text(vm.isPresetEditMode ? "완료" : "편집")
                         .font(.system(size: 16, weight: .bold))
                 }
                 .padding(.trailing, 12)
@@ -71,6 +74,7 @@ struct MainView: View {
 
             Button {
                 // TODO: 사진 불러오기 연결
+                vm.send(action: .goToPhotoSelection)
             } label: {
                 Image(systemName: "photo.badge.plus")
                     .resizable()
@@ -97,6 +101,7 @@ struct MainView: View {
 }
 
 #Preview {
-    MainView()
+    MainView(vm: .init(container: .stub), isPresetEditMode: false)
+        .environmentObject(DIContainer.stub)
 }
 

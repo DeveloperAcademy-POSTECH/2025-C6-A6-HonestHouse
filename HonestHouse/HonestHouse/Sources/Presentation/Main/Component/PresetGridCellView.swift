@@ -8,12 +8,10 @@
 import SwiftUI
 
 struct PresetGridCellView: View {
+    @Environment(PresetViewModel.self) var vm
     let preset: Preset
     let isEditMode: Bool
     let isSelected: Bool
-    let onTap: (Preset) -> Void
-    let onShoot: (Preset) -> Void
-    let onToggleSelection: ((Preset) -> Void)?
 
     var body: some View {
         ZStack(alignment: .bottomTrailing) {
@@ -29,9 +27,9 @@ struct PresetGridCellView: View {
         .contentShape(Rectangle())
         .onTapGesture {
             if isEditMode {
-                onToggleSelection?(preset)
+                vm.onToggleSelection(preset: preset)
             } else {
-                onTap(preset)
+                
             }
         }
     }
@@ -72,7 +70,7 @@ struct PresetGridCellView: View {
     
     private func presetShootCameraButton() -> some View {
         Button {
-            onShoot(preset)
+            
         } label: {
             Image(systemName: "camera.circle")
                 .font(.system(size: 24))

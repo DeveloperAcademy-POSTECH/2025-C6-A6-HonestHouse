@@ -11,6 +11,14 @@ import SwiftUI
 final class PhotoSelectionViewModel {
     typealias Success = [String]
     typealias Failure = SelectionError
+    
+    enum Action {
+        case goToGroupedPhoto
+    }
+    
+    private var container: DIContainer
+    private var imageOperationsService: ImageOperationsServiceType
+    
     var state: ArchiveState<Success, Failure> = .idle
     
     var storageList: StorageList?
@@ -27,14 +35,21 @@ final class PhotoSelectionViewModel {
     
     var selectedPhotos: [Photo] = []
     
-    private var imageOperationsService: ImageOperationsServiceType?
+    init(container: DIContainer) {
+        self.container = container
+        self.imageOperationsService = container.services.imageOperationsService
+    }
     
 }
 
 extension PhotoSelectionViewModel: ArchiveErrorHandleable {
-    func configure(container: DIContainer) {
-        guard self.imageOperationsService == nil else { return }
-        self.imageOperationsService = container.services.imageOperationsService
+    
+    func send(action: Action) {
+        switch action {
+            
+        case .goToGroupedPhoto:
+            container.navigationRouter.push(to: .groupedPhotos(selectedPhotos))
+        }
     }
     
     func handleError(_ error: Error) {
@@ -47,10 +62,6 @@ extension PhotoSelectionViewModel: ArchiveErrorHandleable {
     
     /// storageListResponse를 받아와서 storageList로 변환
     func getStorageList() async throws {
-        guard let imageOperationsService = imageOperationsService else {
-            throw SelectionError.generic
-        }
-        
         do {
             let storageListResponse = try await imageOperationsService.getStorageList()
             storageList = storageListResponse.toEntity()
@@ -61,10 +72,6 @@ extension PhotoSelectionViewModel: ArchiveErrorHandleable {
     
     /// directoryListResponse를 받아와서 directoryList로 변환
     func getDirectoryList(storage: String) async throws {
-        guard let imageOperationsService = imageOperationsService else {
-            throw SelectionError.generic
-        }
-        
         do {
             let directoryListResponse = try await imageOperationsService.getDirectoryList(storage: storage)
             directoryList = directoryListResponse.toEntity()
@@ -75,10 +82,6 @@ extension PhotoSelectionViewModel: ArchiveErrorHandleable {
     
     /// contentListResponse를 받아와서 contentList로 변환
     func getContentList(storage: String, directory: String, type: String, kind: String, page: Int) async throws {
-        guard let imageOperationsService = imageOperationsService else {
-            throw SelectionError.generic
-        }
-        
         do {
             let contentListResponse = try await imageOperationsService.getContentList(storage: storage, directory: directory, type: type, kind: kind, page: page)
             contentList = contentListResponse.toEntity()
@@ -181,5 +184,11 @@ extension PhotoSelectionViewModel: ArchiveErrorHandleable {
         } else {
             selectedPhotos.append(photo)
         }
+    }
+}
+
+extension PhotoSelectionViewModel {
+    func goToGroupedPhotos() {
+        container.navigationRouter.push(to: .groupedPhotos(selectedPhotos))
     }
 }

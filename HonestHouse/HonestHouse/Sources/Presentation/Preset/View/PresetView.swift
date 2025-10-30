@@ -9,23 +9,20 @@ import SwiftUI
 import SwiftData
 
 struct PresetView: View {
-    @EnvironmentObject private var container: DIContainer
     @Query(sort: \Preset.createdAt, order: .reverse) private var presets: [Preset]
-    @State private var vm: PresetDetailViewModel = PresetDetailViewModel()
-
-    @Binding var isEditMode: Bool
-    let onShowDetail: (Preset) -> Void
-    let onShowCreate: () -> Void
-
+    
+    @EnvironmentObject private var container: DIContainer
+    
+    @State var vm: PresetViewModel
     @State private var showToast: Bool = false
     @State private var toastMessage: String = ""
-
+    
     var body: some View {
         ZStack(alignment: .bottom) {
             presetGridScrollView()
 
             Group {
-                if isEditMode {
+                if vm.isPresetEditMode {
                     deleteButton()
                 } else {
                     HStack {
@@ -36,14 +33,8 @@ struct PresetView: View {
             }
             .padding(.bottom, 24)
 
-            if showToast {
-                ToastView(message: toastMessage, isShowing: $showToast)
-                    .transition(.move(edge: .bottom))
-            }
         }
         .task {
-            vm.configure(container: container)
-            
             NetworkManager.shared.configure(cameraIP: "192.168.1.2", port: 443)
             Task {
                 try await NetworkManager.shared.initializeAuthentication()
@@ -51,68 +42,47 @@ struct PresetView: View {
             
             await vm.getAperture()
         }
-        .onChange(of: isEditMode) { _, newValue in
-            if !newValue {
-                vm.clearSelection()
-            }
-        }
-        .onChange(of: vm.error) { _, newError in
-            if let error = newError {
-                toastMessage = error.localizedDescription
-                showToast = true
-            } else {
-                showToast = false
-            }
-        }
-        .alert("프리셋 적용", isPresented: $vm.showingShootAlert) {
-            Button("취소", role: .cancel) {}
-            Button("적용") {
-                if let preset = vm.shootAlertPreset {
-                    Task {
-                        await vm.setCurrentPreset(preset)
-                    }
-                }
-            }
-            .keyboardShortcut(.defaultAction) // 버튼 배경 파란색 변경 용도
-        } message: {
-            if let preset = vm.shootAlertPreset {
-                Text("'\(preset.name)' 프리셋을 적용하시겠습니까?")
-            }
-        }
+        .environment(vm)
     }
     
     private func presetGridScrollView() -> some View {
         ScrollView {
-            PresetGridView(
-                presets: presets,
-                isEditMode: isEditMode,
-                selectedPresets: vm.selectedPresets,
-                onTap: { preset in
-                    onShowDetail(preset)
-                },
-                onShoot: { preset in
-                    vm.showShootAlert(for: preset)
-                },
-                onToggleSelection: { preset in
-                    vm.toggleSelection(for: preset)
-                }
-            )
+            presetGridView()
             .padding(.top, 3)
             .padding(.horizontal, 2)
         }
         .scrollIndicators(.hidden)
     }
+    
+    private func presetGridView() -> some View {
+        
+        let columns = [
+            GridItem(.flexible(), spacing: 10),
+            GridItem(.flexible(), spacing: 10)
+        ]
+        
+        return LazyVGrid(columns: columns, spacing: 10) {
+            ForEach(presets) { preset in
+                PresetGridCellView(
+                    preset: preset,
+                    isEditMode: vm.isPresetEditMode,
+                    isSelected: vm.selectedPresets.contains(preset.id)
+                )
+                .environment(vm)
+            }
+        }
+    }
 
     private func addButton() -> some View {
         Button {
-            onShowCreate()
+            
         } label: {
             if #available(iOS 26.0, *) {
                 Image(systemName: "plus")
                     .font(.system(size: 24, weight: .semibold))
                     .foregroundStyle(.black)
                     .frame(width: 48, height: 48)
-                    .glassEffect()
+//                    .glassEffect()
             } else {
                 Image(systemName: "plus")
                     .font(.system(size: 24, weight: .semibold))
@@ -126,7 +96,7 @@ struct PresetView: View {
     private func deleteButton() -> some View {
         Button {
             vm.deleteSelectedPresets()
-            isEditMode = false
+            vm.isPresetEditMode = false
         } label: {
             HStack {
                 Spacer()
@@ -141,4 +111,9 @@ struct PresetView: View {
         }
         .disabled(vm.selectedPresets.isEmpty)
     }
+}
+
+#Preview {
+    PresetView(vm: .init(container: .stub, isPresetEditMode: false))
+        .environmentObject(DIContainer.stub)
 }

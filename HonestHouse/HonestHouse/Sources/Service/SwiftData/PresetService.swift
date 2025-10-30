@@ -79,3 +79,35 @@ enum PresetServiceError: LocalizedError {
         }
     }
 }
+
+// MARK: - StubPresetService
+
+final class StubPresetService: PresetServiceType {
+    func fetchAll() throws -> [Preset] {
+        return [.stub1]
+    }
+    
+    func fetch(by id: UUID) throws -> Preset? {
+        return .stub1
+    }
+    
+    func create(_ preset: Preset) throws {
+        return
+    }
+    
+    func update(_ preset: Preset) throws {
+        return
+    }
+    
+    func delete(_ preset: Preset) throws {
+        return
+    }
+    
+    func delete(at id: UUID) throws {
+        return
+    }
+    
+    func deleteAll() throws {
+        return
+    }
+}

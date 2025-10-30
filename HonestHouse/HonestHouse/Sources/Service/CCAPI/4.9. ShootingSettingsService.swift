@@ -42,6 +42,7 @@ protocol ShootingSettingsServiceType {
 final class ShootingSettingsService: BaseService, ShootingSettingsServiceType {
     func getShootingMode(with version: VersionType) async throws -> ShootingSettings.ShootingModeResponse {
         let response = try await request(ShootingSettingsTarget.getShootingMode, decoding: ShootingSettings.ShootingModeResponse.self)
+        
         return response
     }
 
@@ -138,5 +139,89 @@ final class ShootingSettingsService: BaseService, ShootingSettingsServiceType {
     func putPictureStyle(with version: VersionType, request: ShootingSettings.PictureStyleRequest) async throws -> ShootingSettings.PictureStyleResponse {
         let response = try await self.request(ShootingSettingsTarget.putPictureStyle(request), decoding: ShootingSettings.PictureStyleResponse.self)
         return response
+    }
+}
+
+// MARK: - StubShootingSettingsService
+
+class StubShootingSettingsService: ShootingSettingsServiceType {
+    func putShootingMode(with: VersionType, request: ShootingSettings.ShootingModeRequest) async throws -> ShootingSettings.ShootingModeResponse {
+        return .stub1
+    }
+    
+    func getShootingModeDial(with: VersionType) async throws -> ShootingSettings.ShootingModeResponse {
+        return .stub1
+    }
+    
+    func putShootingModeDial(with: VersionType, request: ShootingSettings.ShootingModeRequest) async throws -> ShootingSettings.ShootingModeResponse {
+        return .stub1
+    }
+    
+    func getAV(with: VersionType) async throws -> ShootingSettings.AVResponse {
+        return .stub1
+    }
+    
+    func putAV(with: VersionType, request: ShootingSettings.AVRequest) async throws -> ShootingSettings.AVResponse {
+        return .stub1
+    }
+    
+    func getTV(with: VersionType) async throws -> ShootingSettings.TVResponse {
+        return .stub1
+    }
+    
+    func putTV(with: VersionType, request: ShootingSettings.TVRequest) async throws -> ShootingSettings.TVResponse {
+        return .stub1
+    }
+    
+    func getISO(with: VersionType) async throws -> ShootingSettings.ISOResponse {
+        return .stub1
+    }
+    
+    func putISO(with: VersionType, request: ShootingSettings.ISORequest) async throws -> ShootingSettings.ISOResponse {
+        return .stub1
+    }
+    
+    func getExposureCompensation(with: VersionType) async throws -> ShootingSettings.ExposureCompensationResponse {
+        return .stub1
+    }
+    
+    func putExposureCompensation(with: VersionType, request: ShootingSettings.ExposureCompensationRequest) async throws -> ShootingSettings.ExposureCompensationResponse {
+        return .stub1
+    }
+    
+    func getWhiteBalance(with: VersionType) async throws -> ShootingSettings.WhiteBalanceResponse {
+        return .stub1
+    }
+    
+    func putWhiteBalance(with: VersionType, request: ShootingSettings.WhiteBalanceRequest) async throws -> ShootingSettings.WhiteBalanceResponse {
+        return .stub1
+    }
+    
+    func getColorTemperature(with: VersionType) async throws -> ShootingSettings.ColorTemperatureResponse {
+        return .stub1
+    }
+    
+    func putColorTemperature(with: VersionType, request: ShootingSettings.ColorTemperatureRequest) async throws -> ShootingSettings.ColorTemperatureResponse {
+        return .stub1
+    }
+    
+    func getWbShift(with: VersionType) async throws -> ShootingSettings.WBShiftResponse {
+        return .stub1
+    }
+    
+    func putWbShift(with: VersionType, request: ShootingSettings.WBShiftRequest) async throws -> ShootingSettings.WBShiftResponse {
+        return .stub1
+    }
+    
+    func putPictureStyle(with: VersionType, request: ShootingSettings.PictureStyleRequest) async throws -> ShootingSettings.PictureStyleResponse {
+        return .stub1
+    }
+    
+    func getShootingMode(with: VersionType) async throws -> ShootingSettings.ShootingModeResponse {
+        return .stub1
+    }
+    
+    func getPictureStyle(with: VersionType) async throws -> ShootingSettings.PictureStyleResponse {
+        return .stub1
     }
 }

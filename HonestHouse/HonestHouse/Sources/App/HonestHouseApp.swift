@@ -17,7 +17,7 @@ struct HonestHouseApp: App {
         do {
             modelContainer = try ModelContainer(for: Preset.self)
             let services = Services(modelContext: modelContainer.mainContext)
-            container = DIContainer(services: services)
+            container = DIContainer(services: services, managers: Managers())
         } catch {
             fatalError("Failed to create ModelContainer: \(error)")
         }
@@ -25,7 +25,7 @@ struct HonestHouseApp: App {
 
     var body: some Scene {
         WindowGroup {
-            MainView()
+            MainView(vm: MainViewModel(container: container))
                 .environmentObject(container)
         }
         .modelContainer(modelContainer)

@@ -9,7 +9,7 @@ import SwiftData
 import Foundation
 
 @Model
-final class Preset {
+final class Preset: Hashable {
     @Attribute(.unique) var id: UUID
     var name: String
     var createdAt: Date
@@ -85,5 +85,22 @@ final class Preset {
         self.tintMagentaGreen = tintMagentaGreen
         self.createdAt = createdAt
         self.updatedAt = updatedAt
+    }
+}
+
+// MARK: - Hashable Conformance
+extension Preset {
+    static func == (lhs: Preset, rhs: Preset) -> Bool {
+        lhs.id == rhs.id
+    }
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+    }
+}
+
+extension Preset {
+    static var stub1: Preset {
+        .init(name: "", pictureStyle: .auto, shootingMode: .av)
     }
 }

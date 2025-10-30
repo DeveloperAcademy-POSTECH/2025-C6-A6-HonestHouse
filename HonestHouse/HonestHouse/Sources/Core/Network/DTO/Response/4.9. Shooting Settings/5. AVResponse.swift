@@ -23,4 +23,11 @@ extension ShootingSettings.AVResponse {
             ability: ability
         )
     }
+    
+    static var stub1: ShootingSettings.AVResponse {
+        .init(
+            value: "",
+            ability: [""]
+        )
+    }
 }

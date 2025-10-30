@@ -9,18 +9,14 @@ import SwiftUI
 import Kingfisher
 
 struct GroupedPhotosView: View {
-    @State private var vm: GroupedPhotosViewModel
     @EnvironmentObject var container: DIContainer
+    @State var vm: GroupedPhotosViewModel
     
     @State private var showToast: Bool = false
     @State private var toastMessage: String = ""
     
     var columns: [GridItem] {
         Array(repeating: GridItem(.flexible()), count: 2)
-    }
-    
-    init(selectedPhotos: [Photo]) {
-        _vm = State(wrappedValue: GroupedPhotosViewModel(selectedPhotos: selectedPhotos))
     }
     
     var body: some View {
@@ -41,7 +37,7 @@ struct GroupedPhotosView: View {
             }
         }
         .task {
-            vm.configure(container: container)
+//            vm.configure(container: container)
             vm.startGrouping()
         }
         .onChange(of: vm.groupingState) { _, newState in
@@ -59,10 +55,11 @@ struct GroupedPhotosView: View {
             LazyVGrid(columns: columns, spacing: 10) {
                 ForEach(groupedPhotos) { group in
                     GroupedPhotosGridCellView(
-                        group: group,
-                        selectedPhotosInGroup: vm.selectedPhotosInGroup,
-                        onTapGroupedPhoto: vm.toggleGroupedPhotoView
+                        group: group
+//                        selectedPhotosInGroup: vm.selectedPhotosInGroup,
+//                        onTapGroupedPhoto: vm.toggleGroupedPhotoView
                     )
+                    .environment(vm)
                 }
             }
             .padding(.horizontal, 16)

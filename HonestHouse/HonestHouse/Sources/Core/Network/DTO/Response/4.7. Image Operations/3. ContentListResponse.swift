@@ -19,5 +19,9 @@ extension ImageOperations.ContentListResponse {
     func toEntity() -> ContentList {
         ContentList(url: url)
     }
+    
+    static var stub1: ImageOperations.ContentListResponse {
+        .init(url: [""])
+    }
 }
 

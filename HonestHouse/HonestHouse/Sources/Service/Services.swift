@@ -12,9 +12,8 @@ protocol ServiceType {
     var shootingControlService: ShootingControlServiceType { get set }
     var shootingSettingsService: ShootingSettingsServiceType { get set }
     var imageOperationsService: ImageOperationsServiceType { get set }
-    var presetService: PresetServiceType { get set }
-    var visionManager: VisionManagerType { get }
-    var photoManager: PhotoManagerType { get }
+    var presetService: PresetServiceType { get }
+
 }
 
 class Services: ServiceType {
@@ -22,15 +21,20 @@ class Services: ServiceType {
     var shootingSettingsService: ShootingSettingsServiceType
     var imageOperationsService: ImageOperationsServiceType
     var presetService: PresetServiceType
-    var visionManager: VisionManagerType
-    var photoManager: PhotoManagerType
     
     init(modelContext: ModelContext) {
         self.shootingControlService = ShootingControlService()
         self.shootingSettingsService = ShootingSettingsService()
         self.imageOperationsService = ImageOperationsService()
         self.presetService = PresetService(modelContext: modelContext)
-        self.visionManager = VisionManager()
-        self.photoManager = PhotoManager()
     }
+}
+
+// MARK: - StubServices
+
+class StubServices: ServiceType {
+    var shootingControlService: ShootingControlServiceType = StubShootingControlService()
+    var shootingSettingsService: ShootingSettingsServiceType = StubShootingSettingsService()
+    var imageOperationsService: ImageOperationsServiceType = StubImageOperationsService()
+    var presetService: PresetServiceType = StubPresetService()
 }
