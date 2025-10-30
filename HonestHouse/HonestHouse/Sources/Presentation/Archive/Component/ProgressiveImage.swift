@@ -8,10 +8,10 @@
 import SwiftUI
 import Kingfisher
 
-/// Progressive Loading: 썸네일 → 원본 전환
+/// Progressive Loading: 썸네일 → display 전환
 struct ProgressiveImage: View {
     let thumbnailURL: String
-    let originalURL: String
+    let displayURL: String
 
     @State private var loadingFailed = false
 
@@ -25,7 +25,7 @@ struct ProgressiveImage: View {
                 .cacheMemoryOnly()
                 .loadDiskFileSynchronously()  // 캐시된 썸네일 즉시 표시
                 .fade(duration: 0.1)
-                .placeholder {
+                .placeholder { // TODO: - 스켈레톤 UI 씌우기
                     Rectangle()
                         .fill(Color.gray.opacity(0.3))
                         .overlay(ProgressView())
@@ -33,10 +33,10 @@ struct ProgressiveImage: View {
                 .resizable()
                 .aspectRatio(contentMode: .fit)
 
-            // 원본 이미지를 Kingfisher로 로드 (메모리 절약을 위해 화면 크기로 다운샘플링)
-            KFImage(URL(string: originalURL))
+            // display 이미지를 Kingfisher로 로드 (메모리 절약을 위해 화면 크기로 다운샘플링)
+            KFImage(URL(string: displayURL))
                 .setProcessor(DownsamplingImageProcessor(size: CGSize(width: 1200, height: 1200)))  // 메모리 절약
-                .cacheOriginalImage()  // 디스크에는 원본 캐시
+                .cacheOriginalImage()  // 디스크에는 display 캐시
                 .retry(maxCount: 3, interval: .seconds(2))  // 503 에러 자동 재시도
                 .fade(duration: 0.3)
                 .onSuccess { _ in

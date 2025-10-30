@@ -9,11 +9,13 @@ import Foundation
 
 protocol ImagePrefetchManagerType {
 
-    /// 전체 이미지 URL 목록으로 prefetch 시작
-    /// - Parameters:
-    ///   - urls: prefetch할 이미지 URL 목록
-    ///   - highPriority: true면 제한 없이 모두 prefetch (그룹화된 이미지용), false면 처음 20개만
-    func startPrefetch(urls: [String], highPriority: Bool)
+    /// 선택된 이미지들을 디스크에 display 사이즈(1200x1200)로 prefetch
+    /// - Parameter urls: prefetch할 이미지 URL 목록
+    func prefetchSelectedPhotosForDisk(urls: [String])
+
+    /// 썸네일 사이즈(300x300)로 prefetch (Vision 처리용)
+    /// - Parameter urls: prefetch할 이미지 URL 목록
+    func prefetchThumbnails(urls: [String])
 
     /// 모든 prefetch 작업 중단
     func stopAll()

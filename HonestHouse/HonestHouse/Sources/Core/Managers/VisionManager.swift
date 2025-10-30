@@ -7,6 +7,7 @@
 
 import SwiftUI
 import Vision
+import Kingfisher
 
 class VisionManager: VisionManagerType {
     private let imageLoader: ImageLoader
@@ -19,38 +20,39 @@ class VisionManager: VisionManagerType {
         _ photos: [Photo],
         threshold: Float
     ) async throws -> [SimilarPhotoGroup] {
-        let features = try await extractFeatures(from: photos)
-        
+        let features = try await extractFeaturesFromThumbnails(from: photos)
+
         return try await groupSimilarImages(
             analyzedPhotos: features,
             threshold: threshold
         )
     }
     
-    // 각 이미지의 특징을 Vision으로 추출
-    private func extractFeatures(from photos: [Photo]) async throws -> [AnalyzedPhoto] {
+    /// 썸네일에서 Vision 특징 추출 (Kingfisher 캐시 활용)
+    private func extractFeaturesFromThumbnails(from photos: [Photo]) async throws -> [AnalyzedPhoto] {
         var features: [AnalyzedPhoto] = []
         var errorInfos: [(photo: Photo, error: Error)] = []
-        
+
         for photo in photos {
             do {
-                let uiImage = try await imageLoader.fetchUIImage(from: photo.url)
-                
+                // Kingfisher를 사용해서 썸네일 캐시에서 이미지 가져오기
+                let uiImage = try await fetchThumbnailImage(from: photo.thumbnailURL)
+
                 guard let cgImage = uiImage.cgImage else {
-                    errorInfos.append((photo, VisionError.cgImageConversion(url: photo.url)))
+                    errorInfos.append((photo, VisionError.cgImageConversion(url: photo.thumbnailURL)))
                     continue
                 }
-                
+
                 let request = VNGenerateImageFeaturePrintRequest()
                 let handler = VNImageRequestHandler(cgImage: cgImage, options: [:])
-                
+
                 try handler.perform([request])
-                
+
                 guard let observation = request.results?.first else {
-                    errorInfos.append((photo, VisionError.observation(url: photo.url)))
+                    errorInfos.append((photo, VisionError.observation(url: photo.thumbnailURL)))
                     continue
                 }
-                
+
                 features.append(
                     AnalyzedPhoto(
                         photo: photo,
@@ -59,19 +61,88 @@ class VisionManager: VisionManagerType {
                 )
             }
             catch let error {
-                errorInfos.append((photo, VisionError.imageFetching(url: photo.url, underlyingError: error)))
+                errorInfos.append((photo, VisionError.imageFetching(url: photo.thumbnailURL, underlyingError: error)))
                 continue
             }
         }
-        
+
         if !errorInfos.isEmpty {
             let failedPhotos = errorInfos.map { $0.photo }
             let errors = errorInfos.map{ $0.error }
             throw VisionError.partialAnalysis(failedPhotos: failedPhotos, errors: errors)
         }
-        
+
         return features
     }
+
+    /// Kingfisher를 사용해서 썸네일 이미지 가져오기 (캐시 우선)
+    private func fetchThumbnailImage(from urlString: String) async throws -> UIImage {
+        guard let url = URL(string: urlString) else {
+            throw ImageLoadingError.invalidURL
+        }
+
+        return try await withCheckedThrowingContinuation { continuation in
+            KingfisherManager.shared.retrieveImage(
+                with: url,
+                options: [
+                    .processor(DownsamplingImageProcessor(size: CGSize(width: 300, height: 300)))
+                ]
+            ) { result in
+                switch result {
+                case .success(let imageResult):
+                    continuation.resume(returning: imageResult.image)
+                case .failure(let error):
+                    continuation.resume(throwing: error)
+                }
+            }
+        }
+    }
+
+    // 각 이미지의 특징을 Vision으로 추출
+//    private func extractFeatures(from photos: [Photo]) async throws -> [AnalyzedPhoto] {
+//        var features: [AnalyzedPhoto] = []
+//        var errorInfos: [(photo: Photo, error: Error)] = []
+//        
+//        for photo in photos {
+//            do {
+//                let uiImage = try await imageLoader.fetchUIImage(from: photo.url)
+//                
+//                guard let cgImage = uiImage.cgImage else {
+//                    errorInfos.append((photo, VisionError.cgImageConversion(url: photo.url)))
+//                    continue
+//                }
+//                
+//                let request = VNGenerateImageFeaturePrintRequest()
+//                let handler = VNImageRequestHandler(cgImage: cgImage, options: [:])
+//                
+//                try handler.perform([request])
+//                
+//                guard let observation = request.results?.first else {
+//                    errorInfos.append((photo, VisionError.observation(url: photo.url)))
+//                    continue
+//                }
+//                
+//                features.append(
+//                    AnalyzedPhoto(
+//                        photo: photo,
+//                        observation: observation
+//                    )
+//                )
+//            }
+//            catch let error {
+//                errorInfos.append((photo, VisionError.imageFetching(url: photo.url, underlyingError: error)))
+//                continue
+//            }
+//        }
+//        
+//        if !errorInfos.isEmpty {
+//            let failedPhotos = errorInfos.map { $0.photo }
+//            let errors = errorInfos.map{ $0.error }
+//            throw VisionError.partialAnalysis(failedPhotos: failedPhotos, errors: errors)
+//        }
+//        
+//        return features
+//    }
     
     // 비슷한 이미지를 그룹핑
     private func groupSimilarImages(

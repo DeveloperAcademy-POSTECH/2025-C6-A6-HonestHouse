@@ -48,9 +48,6 @@ struct GroupedPhotosView: View {
                 showToast = false
             }
         }
-        .onDisappear {
-            vm.stopPrefetching()
-        }
     }
     
     private func groupedPhotosGridView(groupedPhotos: [SimilarPhotoGroup]) -> some View {

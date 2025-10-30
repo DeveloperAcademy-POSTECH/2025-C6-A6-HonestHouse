@@ -16,49 +16,61 @@ final class ImagePrefetchManager: ImagePrefetchManagerType {
         // WiFi Direct 연결 최적화: 동시 다운로드 수 제한
         ImageDownloader.default.downloadTimeout = 15.0
 
-        // 메모리 캐시 제한 설정 (300MB로 제한)
+        // 메모리 캐시 제한 설정 (150MB로 제한)
         let cache = ImageCache.default
-        cache.memoryStorage.config.totalCostLimit = 300 * 1024 * 1024  // 300MB
+        cache.memoryStorage.config.totalCostLimit = 150 * 1024 * 1024  // 150MB
         cache.memoryStorage.config.countLimit = 50  // 최대 50개 이미지
 
-        // 디스크 캐시 제한 (500MB)
-        cache.diskStorage.config.sizeLimit = 500 * 1024 * 1024
+        // 디스크 캐시 제한 (3GB)
+        cache.diskStorage.config.sizeLimit = 3 * 1024 * 1024 * 1024  // 3GB
 
-        // 메모리 경고 시 자동 정리
-        cache.memoryStorage.config.expiration = .seconds(300)  // 5분 후 만료
+        // 캐시 만료 시간 (30분)
+        cache.memoryStorage.config.expiration = .seconds(1800)  // 30분
+        cache.diskStorage.config.expiration = .seconds(1800)  // 30분
     }
 
-    /// 전체 이미지 URL 목록으로 prefetch 시작
-    func startPrefetch(urls: [String], highPriority: Bool = false) {
+    /// 선택된 이미지들을 디스크에 display 사이즈(1200x1200)로 prefetch
+    func prefetchSelectedPhotosForDisk(urls: [String]) {
         guard !urls.isEmpty else { return }
-
-        // 기존 prefetch 중단
-        stopAll()
 
         let imageUrls = urls.compactMap { URL(string: $0) }
 
-        // highPriority면 모든 이미지 prefetch (그룹화된 이미지용)
-        // 아니면 WiFi Direct 대역폭 고려하여 첫 20개만
-        let urlsToPrefetch: [URL]
-        if highPriority {
-            urlsToPrefetch = imageUrls
-            print("🚀 [Prefetch] HIGH PRIORITY: Prefetching all \(imageUrls.count) images")
-        } else {
-            urlsToPrefetch = Array(imageUrls.prefix(20))
-            print("🚀 [Prefetch] Normal priority: Prefetching first \(urlsToPrefetch.count) of \(imageUrls.count) images")
-        }
+        print("💾 [Disk Prefetch] Starting prefetch for \(imageUrls.count) selected images")
 
-        prefetcher = ImagePrefetcher(
-            urls: urlsToPrefetch,
+        // Display 사이즈로 prefetch하여 디스크에 저장
+        let prefetcher = ImagePrefetcher(
+            urls: imageUrls,
             options: [
                 .backgroundDecode,
-                .processor(DownsamplingImageProcessor(size: CGSize(width: 1200, height: 1200)))  // DetailView용 1200x1200
+                .processor(DownsamplingImageProcessor(size: CGSize(width: 1200, height: 1200))),
+                .cacheOriginalImage  // 디스크에 캐시
             ]
         )
 
-        // 동시 다운로드 수를 2개로 제한 (WiFi Direct 대역폭 고려)
-        prefetcher?.maxConcurrentDownloads = 2
-        prefetcher?.start()
+        // WiFi Direct 대역폭 고려하여 동시 다운로드 2개로 제한
+        prefetcher.maxConcurrentDownloads = 2
+
+        prefetcher.start()
+    }
+
+    /// 썸네일 사이즈(300x300)로 prefetch (Vision 처리용)
+    func prefetchThumbnails(urls: [String]) {
+        guard !urls.isEmpty else { return }
+
+        let imageUrls = urls.compactMap { URL(string: $0) }
+
+        print("🖼️ [Thumbnail Prefetch] Starting prefetch for \(imageUrls.count) thumbnails")
+
+        let prefetcher = ImagePrefetcher(
+            urls: imageUrls,
+            options: [
+                .backgroundDecode,
+                .processor(DownsamplingImageProcessor(size: CGSize(width: 300, height: 300)))
+            ]
+        )
+
+        prefetcher.maxConcurrentDownloads = 3  // 썸네일은 작으니 3개 동시
+        prefetcher.start()
     }
 
     /// 모든 prefetch 작업 중단

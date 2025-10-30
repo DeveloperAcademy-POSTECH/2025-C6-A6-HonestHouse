@@ -14,7 +14,7 @@ struct PhotoSelectionDetailView<Item: SelectableItem>: View {
     var body: some View {
         ProgressiveImage(
             thumbnailURL: item.thumbnailURL,
-            originalURL: item.url
+            displayURL: item.url
         )
         .onDisappear {
             // DetailView를 나갈 때 메모리 캐시 일부 정리 (메모리 사용량 감소)

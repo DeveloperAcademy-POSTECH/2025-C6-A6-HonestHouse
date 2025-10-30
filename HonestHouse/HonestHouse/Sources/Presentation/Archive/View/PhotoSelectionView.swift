@@ -17,7 +17,7 @@ struct PhotoSelectionView: View {
     @State private var toastMessage: String = ""
     
     let columnCount: Int = 3
-    
+
     var columns: [GridItem] {
         Array(repeating: GridItem(.flexible(), spacing: 2), count: columnCount)
     }
@@ -27,17 +27,17 @@ struct PhotoSelectionView: View {
                 switch vm.state {
                 case .idle, .loading:
                     ProgressView("사진을 불러오는 중...")
-                    
+
                 case .success:
                     ZStack {
                         photoSelectionGridView()
                         selectionCompleteButtonView()
                     }
-                    
+
                 case .failure(_):
                     Color.clear
                 }
-                
+
                 if showToast {
                     ToastView(message: toastMessage, isShowing: $showToast)
                         .transition(.move(edge: .bottom))
@@ -45,6 +45,9 @@ struct PhotoSelectionView: View {
             }
             .navigationTitle("카메라 이름")
             .navigationBarTitleDisplayMode(.large)
+            .navigationDestination(isPresented: $navigateToGroupedView) {
+                GroupedPhotosView(selectedPhotos: vm.selectedPhotos)
+            }
             .task {
                 await vm.fetchFirstPageImage()
             }
@@ -55,14 +58,6 @@ struct PhotoSelectionView: View {
                 } else {
                     showToast = false
                 }
-            }
-            // 메모리 경고 시 prefetch 중단
-            .onReceive(NotificationCenter.default.publisher(for: UIApplication.didReceiveMemoryWarningNotification)) { _ in
-                vm.cancelPrefetching()
-            }
-            // 뷰 사라질 때 prefetch 중단
-            .onDisappear {
-                vm.cancelPrefetching()
             }
         }
     
@@ -75,7 +70,7 @@ struct PhotoSelectionView: View {
                     SelectionGridCellView(
                         item: photo,
                         isSelected: vm.selectedPhotos.contains(where: { $0.url == url }),
-                        onTapSelectionGridCell: { vm.toggleGridCell(for: photo) }
+                        onTapSelectionGridCell: { vm.toggleGridCell(for: photo, at: index) }
                     )
                     .id(url)
                 }

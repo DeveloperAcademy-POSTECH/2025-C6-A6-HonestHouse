@@ -56,6 +56,8 @@ class GroupedPhotosViewModel {
 
         Task {
             do {
+                // 썸네일 기반으로 Vision 처리 (메모리 효율적)
+                print("🔍 [GroupedPhotos] Starting Vision analysis with thumbnails")
                 let result = try await visionManager.analyzeImages(photosFromSelection, threshold: 0.8)
                 groupingState = .success(result)
 
@@ -82,7 +84,7 @@ class GroupedPhotosViewModel {
                 // 저장 완료 후 모든 캐시 삭제
                 ImageCache.default.clearMemoryCache()
                 ImageCache.default.clearDiskCache {
-                    print("🗑️ [Cache] All cache cleared after save")
+                    Swift.print("🗑️ [Cache] All cache cleared after save")
                 }
 
                 savingState = .success
@@ -105,19 +107,9 @@ class GroupedPhotosViewModel {
     /// 특정 그룹의 이미지들을 즉시 prefetch (GridCell 탭 시 호출)
     func prefetchGroupImages(for group: SimilarPhotoGroup) {
 
-        print("⚡️ [GroupedPhotos] Immediate prefetch for group with \(group.photos.count) images")
+        let displayUrls = group.photos.map { $0.displayURL }
 
-        // DetailView에서 사용할 원본 이미지를 1200x1200으로 즉시 prefetch
-        let originalUrls = group.photos.map { $0.url }.compactMap { URL(string: $0) }
-        let prefetcher = ImagePrefetcher(
-            urls: originalUrls,
-            options: [
-                .backgroundDecode,
-                .processor(DownsamplingImageProcessor(size: CGSize(width: 1200, height: 1200)))
-            ]
-        )
-        prefetcher.maxConcurrentDownloads = 2
-        prefetcher.start()
+        print("⚡️ [GroupedPhotos] Prefetching \(displayUrls.count) display images for group")
 
         print("   - Prefetching \(originalUrls.count) original images for DetailView")
     }
