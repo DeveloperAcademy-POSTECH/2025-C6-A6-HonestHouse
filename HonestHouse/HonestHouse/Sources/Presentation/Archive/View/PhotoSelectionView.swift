@@ -23,7 +23,6 @@ struct PhotoSelectionView: View {
     }
     
     var body: some View {
-        NavigationStack {
             ZStack {
                 switch vm.state {
                 case .idle, .loading:
@@ -57,7 +56,7 @@ struct PhotoSelectionView: View {
                     showToast = false
                 }
             }
-        }
+
     }
     
     private func photoSelectionGridView() -> some View {
