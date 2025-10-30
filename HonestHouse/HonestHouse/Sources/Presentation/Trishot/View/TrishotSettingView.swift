@@ -25,20 +25,20 @@ struct TrishotSettingView: View {
     // 프리셋 3개 목록 (트라이샷)
     func presetListView() -> some View {
         VStack(spacing: 32) {
-            ForEach(Array(vm.selectedTrishot.keys), id: \.id) { preset in
-                presetView(preset)
+            ForEach(vm.trishotItems.indices) { index in
+                presetView(vm.trishotItems[index], index)
             }
         }
     }
     
     // 프리셋 타이틀 + 내용
-    func presetView(_ preset: Preset) -> some View {
+    func presetView(_ item: TrishotItem, _ index: Int) -> some View {
         VStack(alignment: .leading, spacing: 12) {
-            titleView(name: preset.name)
-            contentView(preset)
+            titleView(name: item.preset.name)
+            contentView(item, index)
         }
         .onTapGesture {
-            vm.send(action: .togglePreset(preset))
+            vm.send(action: .togglePreset(item.id))
         }
     }
     
@@ -47,7 +47,7 @@ struct TrishotSettingView: View {
         
         Button {
             vm.send(action: .goToTrishotSelection)
-            checkFontFile()
+            
         } label: {
             HStack {
                 Text(name)
@@ -61,14 +61,14 @@ struct TrishotSettingView: View {
     }
     
     // 프리셋 내용
-    func contentView(_ preset: Preset) -> some View {
+    func contentView(_ item: TrishotItem, _ index: Int) -> some View {
         HStack {
-            contentSettingsView(preset)
+            contentSettingsView(item.preset)
             Spacer()
-            contentCircleView(num: 1)
+            contentCircleView(num: index + 1)
         }
-        .environment(\.layoutDirection, vm.selectedTrishot[preset] == true ? .leftToRight : .rightToLeft)
-        .animation(.default, value: vm.selectedTrishot[preset])
+        .environment(\.layoutDirection, item.isSelected ? .leftToRight : .rightToLeft)
+        .animation(.default, value: item.isSelected)
         .background(Color.g11)
         .clipShape(RoundedRectangle(cornerRadius: 100))
     }
@@ -92,6 +92,26 @@ struct TrishotSettingView: View {
         .environment(\.layoutDirection, .leftToRight)
         .padding(.leading, 39)
         
+    }
+    
+    func filterIcon(iso: ISO) -> some View {
+        Image("")
+    }
+    
+    func shootingModeIcon() -> some View {
+        Image("")
+    }
+    
+    func blueAmberIcon() -> some View {
+        Image("")
+    }
+    
+    func exposureIcon() -> some View {
+        Image("")
+    }
+    
+    func tintIcon() -> some View {
+        Image("")
     }
     
     // 프리셋 내용 - 원

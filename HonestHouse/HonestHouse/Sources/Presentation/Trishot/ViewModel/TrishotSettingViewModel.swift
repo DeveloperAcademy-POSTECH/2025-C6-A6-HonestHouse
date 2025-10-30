@@ -12,11 +12,15 @@ import SwiftUI
 final class TrishotSettingViewModel {
     var container: DIContainer
     
-    var selectedTrishot: [Preset:Bool] = [.stub1 : true, .stub2 : false, .stub3 : false ]
+    var trishotItems: [TrishotItem] = [
+        .init(preset: .stub1, isSelected: true),
+        .init(preset: .stub2, isSelected: false),
+        .init(preset: .stub3, isSelected: false)
+    ]
     
     enum Action {
         case goToTrishotSelection
-        case togglePreset(Preset)
+        case togglePreset(UUID)
     }
     
     init(container: DIContainer) {
@@ -29,8 +33,10 @@ extension TrishotSettingViewModel {
         switch action {
         case .goToTrishotSelection:
             container.navigationRouter.push(to: .trishotSelection)
-        case .togglePreset(let preset):
-            selectedTrishot[preset]?.toggle()
+        case .togglePreset(let id):
+            if let index = trishotItems.firstIndex(where: { $0.id == id }) {
+                trishotItems[index].isSelected.toggle()
+            }
         }
     }
 }
