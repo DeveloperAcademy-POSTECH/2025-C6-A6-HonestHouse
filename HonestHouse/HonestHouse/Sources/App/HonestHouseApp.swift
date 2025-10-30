@@ -27,7 +27,9 @@ struct HonestHouseApp: App {
         WindowGroup {
             MainView(vm: MainViewModel(container: container))
                 .environmentObject(container)
+                .preferredColorScheme(.dark)
         }
         .modelContainer(modelContainer)
+        
     }
 }
