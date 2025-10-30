@@ -10,15 +10,8 @@ import SwiftUI
 struct CameraConnectionView: View {
     var body: some View {
         
-        NavigationStack {
-            NavigationLink("연결") {
-                connectionView
-            }
-            
-        
-            NavigationLink("컨트롤") {
-                RemoteControllerView()
-            }
+        VStack {
+            // TODO: - 카메라 연결 시트
         }
         
     }

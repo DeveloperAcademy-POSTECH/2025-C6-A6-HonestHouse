@@ -22,9 +22,9 @@ struct MainView: View {
                 
                 Picker("", selection: $vm.selectedSegment) {
                     ForEach(MainViewSegmentType.allCases, id: \.self) { option in
-                        Text(option.displayName).tag(option)
                     }
                 }
+                .pickerStyle(.palette)
                 
                 switch vm.selectedSegment {
                 case .trishot:
@@ -44,16 +44,16 @@ struct MainView: View {
                 
             }
             .padding(.horizontal, 16)
-        }
-        .navigationDestination(for: NavigationDestination.self) {
-            NavigationRoutingView(destination: $0)
+            .navigationDestination(for: NavigationDestination.self) {
+                NavigationRoutingView(destination: $0)
+            }
         }
     }
     
     private func cameraAndArchiveHeaderView() -> some View {
         HStack {
             Button {
-                // TODO: 카메라 설정 뷰 연결
+                // TODO: 카메라 연결
             } label: {
                 Image(systemName: "camera.badge.ellipsis")
                     .resizable()
@@ -74,6 +74,7 @@ struct MainView: View {
 
             Button {
                 // TODO: 사진 불러오기 연결
+                vm.send(action: .goToPhotoSelection)
             } label: {
                 Image(systemName: "photo.badge.plus")
                     .resizable()

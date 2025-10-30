@@ -112,3 +112,8 @@ struct PresetView: View {
         .disabled(vm.selectedPresets.isEmpty)
     }
 }
+
+#Preview {
+    PresetView(vm: .init(container: .stub, isPresetEditMode: false))
+        .environmentObject(DIContainer.stub)
+}

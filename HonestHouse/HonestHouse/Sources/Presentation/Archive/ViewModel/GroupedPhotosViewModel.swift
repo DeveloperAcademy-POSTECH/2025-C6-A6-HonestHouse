@@ -20,10 +20,14 @@ class GroupedPhotosViewModel {
     var groupingState: GroupingState = .idle
     var savingState: SavingState = .idle
     
-    init(container: DIContainer, selectedPhotos: [Photo]) {
+    init(
+        container: DIContainer,
+        selectedPhotos: [Photo]
+    ) {
         self.container = container
         visionManager = container.managers.visionManager
         photoManager = container.managers.photoManager
+        
         self.photosFromSelection = selectedPhotos
     }
     
