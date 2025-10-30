@@ -18,22 +18,9 @@
 		21C47E2E2E9AA5FC00FB6029 /* HonestHouse.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HonestHouse.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
-/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		6CFE30BB2EAF548000CD1DEC /* Exceptions for "HonestHouse" folder in "HonestHouse" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Info.plist,
-			);
-			target = 21C47E2D2E9AA5FC00FB6029 /* HonestHouse */;
-		};
-/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
-
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		21C47E302E9AA5FC00FB6029 /* HonestHouse */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				6CFE30BB2EAF548000CD1DEC /* Exceptions for "HonestHouse" folder in "HonestHouse" target */,
-			);
 			path = HonestHouse;
 			sourceTree = "<group>";
 		};
