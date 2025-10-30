@@ -44,17 +44,7 @@ class CanonLiveViewStreamAuth: NSObject, ObservableObject {
     }
     
     // MARK: - Stream Type
-    enum StreamType {
-        case scroll
-        case scrollDetail
-        
-        var endpoint: String {
-            switch self {
-            case .scroll: return "/shooting/liveview/scroll"
-            case .scrollDetail: return "/shooting/liveview/scrolldetail"
-            }
-        }
-    }
+
     
     // MARK: - Private Properties
     private var cameraIP: String = ""
@@ -62,7 +52,9 @@ class CanonLiveViewStreamAuth: NSObject, ObservableObject {
     private var baseURL: String = ""
     private var streamTask: URLSessionDataTask?
     private var authManager: DigestAuthManager?
-    private let parser = ChunkedStreamParser()
+    private lazy var parser: ChunkedStreamParser = {
+        return ChunkedStreamParser(streamType: .scroll)
+    }()
     
     // SSL Delegate
     private let sslDelegate = SSLPinningDelegate()
@@ -114,7 +106,7 @@ class CanonLiveViewStreamAuth: NSObject, ObservableObject {
     }
     
     /// 라이브뷰 시작
-    func startLiveView(size: String = "medium", display: String = "on") async throws {
+    func startLiveView(size: String = "small", display: String = "on") async throws {
         print("🔵 startLiveView called")
         print("   baseURL: \(baseURL)")
         print("   authManager.isReady: \(authManager?.isReady ?? false)")
@@ -142,7 +134,7 @@ class CanonLiveViewStreamAuth: NSObject, ObservableObject {
         
         print("📡 Step 2: Starting streaming...")
         // 2. 스트리밍 시작
-        try await startStreaming(type: .scrollDetail)
+        try await startStreaming(type: .scroll)
     }
     
     /// 스트리밍 중지
@@ -328,8 +320,8 @@ class CanonLiveViewStreamAuth: NSObject, ObservableObject {
         }
         
         let sessionConfig = URLSessionConfiguration.default
-        sessionConfig.timeoutIntervalForRequest = 30.0
-        sessionConfig.timeoutIntervalForResource = 300.0
+        sessionConfig.timeoutIntervalForRequest = 1000.0
+        sessionConfig.timeoutIntervalForResource = 3000.0
         
         let streamSession = URLSession(
             configuration: sessionConfig,
@@ -347,6 +339,13 @@ class CanonLiveViewStreamAuth: NSObject, ObservableObject {
         
         print("✅ Streaming started: \(type.endpoint)")
         print("   Waiting for data...")
+        
+//        // --- 임시 디버깅: 5초 후 스트림 중지 ---
+//        print("DEBUG: Logging chunks for 5 seconds, then cancelling stream...")
+//        try await Task.sleep(nanoseconds: 5_000_000_000) // 5초 대기
+//        streamRequest.cancel() // 5초 후 스트림 중지
+//        print("DEBUG: 5 seconds elapsed, stream cancelled.")
+//        // --- 임시 디버깅 끝 ---
     }
     
     private func sendDeleteRequest() async {
@@ -369,7 +368,7 @@ class CanonLiveViewStreamAuth: NSObject, ObservableObject {
     
     // MARK: - Private Methods - Processing
     
-    private func processFrames(_ frames: [ChunkedStreamParser.ParsedFrame]) {
+    private func processFrames(_ frames: [ParsedFrame]) {
         print("🔄 Processing \(frames.count) frames...")
         
         for frame in frames {
@@ -422,7 +421,7 @@ class CanonLiveViewStreamAuth: NSObject, ObservableObject {
             Task {
                 await stopStreaming()
                 try? await Task.sleep(nanoseconds: 1_000_000_000) // 1초 대기
-                try? await startStreaming(type: .scrollDetail)
+                try? await startStreaming(type: .scroll)
             }
         }
     }
@@ -486,14 +485,14 @@ private class AuthStreamDelegate: NSObject, URLSessionDataDelegate {
     private let parser: ChunkedStreamParser
     private let authManager: DigestAuthManager?
     private let sslDelegate: SSLPinningDelegate
-    private let onFramesReceived: ([ChunkedStreamParser.ParsedFrame]) -> Void
+    private let onFramesReceived: ([ParsedFrame]) -> Void
     private let onAuthError: () -> Void
     private var currentRequest: URLRequest?
     
     init(parser: ChunkedStreamParser,
          authManager: DigestAuthManager?,
          sslDelegate: SSLPinningDelegate,
-         onFramesReceived: @escaping ([ChunkedStreamParser.ParsedFrame]) -> Void,
+         onFramesReceived: @escaping ([ParsedFrame]) -> Void,
          onAuthError: @escaping () -> Void) {
         self.parser = parser
         self.authManager = authManager
@@ -504,10 +503,12 @@ private class AuthStreamDelegate: NSObject, URLSessionDataDelegate {
     }
     
     func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
-        // 청크 데이터 수신 시 파싱
-        print("📦 Received \(data.count) bytes")
+        let dataCopy = Data(data)
+        
+        print("📦 Received \(dataCopy.map { String(format: "%02X", $0) }.joined(separator: " "))")
         Task {
-            let frames = await parser.appendChunk(data)
+            await parser.appendChunk(dataCopy)
+            let frames = await parser.extractFrames()
             if !frames.isEmpty {
                 print("   Parsed \(frames.count) frames")
                 onFramesReceived(frames)
@@ -566,33 +567,9 @@ private class AuthStreamDelegate: NSObject, URLSessionDataDelegate {
     }
 }
 
-// MARK: - Errors
-
-enum StreamError: LocalizedError {
-    case noCameraSet
-    case notAuthenticated
-    case authenticationFailed
-    case failedToStart
-    case streamingFailed
-    case invalidData
-    case httpError(Int)
-    
-    var errorDescription: String? {
-        switch self {
-        case .noCameraSet:
-            return "카메라 IP가 설정되지 않았습니다"
-        case .notAuthenticated:
-            return "인증되지 않았습니다"
-        case .authenticationFailed:
-            return "인증에 실패했습니다"
-        case .failedToStart:
-            return "라이브뷰 시작에 실패했습니다"
-        case .streamingFailed:
-            return "스트리밍 중 오류가 발생했습니다"
-        case .invalidData:
-            return "잘못된 데이터 형식입니다"
-        case .httpError(let code):
-            return "HTTP 오류: \(code)"
-        }
-    }
-}
+// --- 디버깅을 위한 청크 데이터 로그 시작 ---
+//if data.count > 0 {
+//    let preview = data.prefix(20).map { String(format: "%02X", $0) }.joined(separator: " ")
+//    print("   Raw Chunk Preview (first 20 bytes): \(preview)")
+//}
+// --- 디버깅 로그 끝 ---

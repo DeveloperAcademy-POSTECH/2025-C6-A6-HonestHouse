@@ -6,3 +6,15 @@
 //
 
 import Foundation
+
+enum StreamType {
+    case scroll
+    case scrollDetail
+    
+    var endpoint: String {
+        switch self {
+        case .scroll: return "/shooting/liveview/scroll"
+        case .scrollDetail: return "/shooting/liveview/scrolldetail"
+        }
+    }
+}
