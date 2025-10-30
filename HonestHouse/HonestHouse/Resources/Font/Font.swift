@@ -14,8 +14,8 @@ extension Font {
     static let title2: Font = .custom("Pretendard-Bold", size: 20)      /// Pretendard Bold 20 140%
     static let title3: Font = .custom("Pretendard-Bold", size: 18)      /// Pretendard Bold 18 140%
  
-    static let lableL: Font = .custom("Pretendard-Bold", size: 16)      /// Pretendard Bold 16 140%
-    static let lableM: Font = .custom("Pretendard-Bold", size: 14)      /// Pretendard Bold 14 140%
+    static let labelL: Font = .custom("Pretendard-Bold", size: 16)      /// Pretendard Bold 16 140%
+    static let labelM: Font = .custom("Pretendard-Bold", size: 14)      /// Pretendard Bold 14 140%
  
     static let body1: Font = .custom("Pretendard-SemiBold", size: 16)   /// Pretendard SemiBold 16 140%
     static let body2: Font = .custom("Pretendard-SemiBold", size: 14)   /// Pretendard SemiBold 14 140%
