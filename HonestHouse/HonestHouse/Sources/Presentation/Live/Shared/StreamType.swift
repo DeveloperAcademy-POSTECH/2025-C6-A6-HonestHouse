@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum StreamType {
+enum ScrollType {
     case scroll
     case scrollDetail
     

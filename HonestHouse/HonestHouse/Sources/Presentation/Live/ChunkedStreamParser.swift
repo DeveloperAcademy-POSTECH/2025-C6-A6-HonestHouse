@@ -10,9 +10,9 @@ import UIKit
 
 actor ChunkedStreamParser {
     private var buffer = Data()
-    private let streamType: StreamType
+    private let streamType: ScrollType
 
-    init(streamType: StreamType) {
+    init(streamType: ScrollType) {
         self.streamType = streamType
     }
 
@@ -23,7 +23,7 @@ actor ChunkedStreamParser {
     func extractFrames() -> [ParsedFrame] {
         var frames: [ParsedFrame] = []
 
-        while let frame = parseNextFrame() {
+        while let frame = parseNextFrame(type: .scroll) {
             frames.append(frame)
         }
 
@@ -40,8 +40,12 @@ actor ChunkedStreamParser {
     }
 
     // MARK: - Private Methods
-    private func parseNextFrame() -> ParsedFrame? {
-        switch streamType {
+    private func parseNextFrame(type: ScrollType) -> ParsedFrame? {
+        switch type {
+        case .scroll:
+            return parseScrollFrame()
+        case .scrollDetail:
+            return parseScrollDetailFrame()
         }
     }
 
