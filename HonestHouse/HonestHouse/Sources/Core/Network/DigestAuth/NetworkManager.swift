@@ -46,8 +46,8 @@ class NetworkManager {
         sslDelegate.addTrustedHost(cameraIP)
         
         // baseURL 생성
-        let baseURL = "https://\(cameraIP):\(port)/ccapi/ver100/shooting/settings/scroll"
-        
+        let baseURL = "https://\(cameraIP):\(port)/ccapi"
+
         // DigestAuthManager 생성
         self.authManager = DigestAuthManager(
             baseURL: baseURL,
