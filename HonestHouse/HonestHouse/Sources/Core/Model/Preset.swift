@@ -56,6 +56,8 @@ final class Preset: Hashable {
 
     var tintBlueAmber: Int?
     var tintMagentaGreen: Int?
+    
+    var isSelected: Bool
 
     init(
         id: UUID = UUID(),
@@ -70,7 +72,8 @@ final class Preset: Hashable {
         tintBlueAmber: Int? = nil,
         tintMagentaGreen: Int? = nil,
         createdAt: Date = Date(),
-        updatedAt: Date = Date()
+        updatedAt: Date = Date(),
+        isSelected: Bool = false
     ) {
         self.id = id
         self.name = name
@@ -85,6 +88,7 @@ final class Preset: Hashable {
         self.tintMagentaGreen = tintMagentaGreen
         self.createdAt = createdAt
         self.updatedAt = updatedAt
+        self.isSelected = isSelected
     }
 }
 
@@ -97,7 +101,9 @@ extension Preset {
     func hash(into hasher: inout Hasher) {
         hasher.combine(id)
     }
-    
+}
+
+extension Preset {
     var settingsDescription: String {
         let apertureValue = aperture ?? "Auto"
         let isoValue = iso ?? "Auto"

@@ -83,9 +83,7 @@ struct TrishotSettingView: View {
                 Circle().frame(width: 32, height: 32).foregroundStyle(Color.white)
                 Circle().frame(width: 32, height: 32).foregroundStyle(Color.white)
             }
-            Text(preset.settingsDescription)
-                .foregroundStyle(Color.g0)
-                .font(.num4)
+            shootingDescriptionView(preset)
                 
         }
         .frame(maxWidth: .infinity)
@@ -127,6 +125,12 @@ struct TrishotSettingView: View {
             .padding(.vertical, 6)
             .padding(.trailing, 8)
             .foregroundStyle(Color.yellow1)
+    }
+    
+    func shootingDescriptionView(_ preset: Preset) -> some View {
+        Text(preset.settingsDescription)
+            .foregroundStyle(Color.g0)
+            .font(.num4)
     }
     
     func startButtonView() -> some View {
