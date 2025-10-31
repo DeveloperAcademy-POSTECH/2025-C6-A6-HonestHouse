@@ -21,6 +21,7 @@ enum CCAPIError: Error {
     case deviceUnavailable(String)
     case urlNotFound
     case badRequest(String)
+    case httpError(Int)
     
     var localizedDescription: String {
         switch self {
@@ -48,6 +49,8 @@ enum CCAPIError: Error {
             return "URL not found"
         case .badRequest(let message):
             return "Bad request: \(message)"
+        case .httpError(let code):
+            return "HTTP error: \(code)"
         }
     }
 }
