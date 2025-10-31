@@ -47,7 +47,7 @@ class NetworkManager {
         
         // baseURL 생성
         let baseURL = "https://\(cameraIP):\(port)/ccapi"
-
+        
         // DigestAuthManager 생성
         self.authManager = DigestAuthManager(
             baseURL: baseURL,
@@ -137,6 +137,18 @@ class NetworkManager {
     /// Digest Auth 헤더 가져오기 (Event Monitoring 등 스트리밍용)
     func getAuthorizationHeader(method: String, url: String, body: Data? = nil) -> String? {
         return authManager?.getAuthorizationHeader(method: method, url: url, body: body)
+    }
+    
+    func getAuthorizationHeader(
+        method: String,
+        url: String,
+        body: Data? = nil
+    ) -> String? {
+        return authManager?.getAuthorizationHeader(
+            method: method,
+            url: url,
+            body: body
+        )
     }
     
     // MARK: - Private Methods
