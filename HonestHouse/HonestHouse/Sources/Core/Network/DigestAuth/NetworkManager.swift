@@ -139,18 +139,6 @@ class NetworkManager {
         return authManager?.getAuthorizationHeader(method: method, url: url, body: body)
     }
     
-    func getAuthorizationHeader(
-        method: String,
-        url: String,
-        body: Data? = nil
-    ) -> String? {
-        return authManager?.getAuthorizationHeader(
-            method: method,
-            url: url,
-            body: body
-        )
-    }
-    
     // MARK: - Private Methods
     
     private func requestOnce<T: TargetType>(_ target: T, provider: MoyaProvider<MultiTarget>) async throws -> Response {
